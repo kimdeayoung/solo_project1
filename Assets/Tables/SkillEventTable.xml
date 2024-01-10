@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Root xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<Skill>
+		<Index>100000</Index>
+		<EventType>1</EventType>
+	</Skill>
+</Root>

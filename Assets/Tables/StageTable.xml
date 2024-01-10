@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Root xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<Stage>
+		<Index>100000</Index>
+		<ProgressOrder>0</ProgressOrder>
+		<StageNumber>0</StageNumber>
+		<StageName>test1</StageName>
+		<DifficultyType>0</DifficultyType>
+		<Scene>BattleScene</Scene>
+		<Wave>111</Wave>
+	</Stage>
+    <Stage>
+		<Index>100001</Index>
+		<ProgressOrder>1</ProgressOrder>
+		<StageNumber>1</StageNumber>
+		<StageName>test2</StageName>
+		<DifficultyType>0</DifficultyType>
+		<Scene>BattleScene</Scene>
+		<Wave>112</Wave>
+	</Stage>
+</Root>
