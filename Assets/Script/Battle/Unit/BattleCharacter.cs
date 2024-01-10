@@ -11,6 +11,10 @@ public class BattleCharacter : BattleUnit
     [SerializeField]
     private float rotateSpeed;
 
+    private UserControllerData userControllerData;
+
+    public UserControllerData UserControllerData { set => userControllerData = value; }
+
     private void Awake()
     {
         Debug.Assert(animator != null);

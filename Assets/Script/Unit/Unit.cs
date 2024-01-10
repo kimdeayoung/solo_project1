@@ -4,21 +4,22 @@ using UnityEngine;
 
 public abstract class Unit
 {
-    protected uint hp;
-    protected uint atk;
-    protected uint def;
-    protected float moveSpeed;
-
+    protected TRUnit trUnit;
     protected Skill[] skills;
 
-    protected UnitType unitType;
+    public UnitType UnitType { get => trUnit.UnitType; }
+    public uint Hp { get => trUnit.Hp; }
+    public uint Def { get => trUnit.Def; }
+    public float MoveSpeed { get => trUnit.MoveSpeed; }
 
-    public UnitType UnitType { get => unitType; }
+    public string PrefabName { get =>  trUnit.PrefabName; }
 
     public Unit(TRUnit trUnit)
     {
-
+        this.trUnit = trUnit;
+        for (int i = 0; i < trUnit.SkillIndexes.Length; ++i)
+        {
+            skills[i] = new Skill(Tables.Instance.GetRecordOrNull<TRSkill>(TableType.Skill, trUnit.SkillIndexes[i]));
+        }
     }
-
-    
 }

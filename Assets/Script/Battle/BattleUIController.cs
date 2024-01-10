@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,29 +9,23 @@ public class BattleUIController
     private BattleController controller;
 
     private BattleUI uiBattle;
-    private LoadState battleUILoadState;
 
-    public LoadState BattleUILoadState { get => battleUILoadState; }
+    public Joystick Joystick { get => uiBattle.JoyStick; }
 
-    public BattleUIController(BattleController controller, TRStage trStage)
+    public BattleUIController(BattleController controller)
     {
         this.controller = controller;
-        battleUILoadState = LoadState.NotComplete;
     }
 
-    public void CreateBattleUI()
+    public void CreateBattleUI(Action onFinished)
     {
-        AddressableBundleLoader.Instance.InstantiateAsync("BattleUI", null, OnFinishedCreateBattleUI);
-    }
+        AddressableBundleLoader.Instance.InstantiateAsync("BattleUI", null, (GameObject obj)=>
+        {
+            Assert.IsNotNull(obj);
 
-    private void OnFinishedCreateBattleUI(GameObject obj)
-    {
-        Assert.IsNotNull(obj);
-
-        uiBattle = obj.GetComponent<BattleUI>();
-        controller.UserControllerData = new UserControllerData(uiBattle.JoyStick);
-
-        battleUILoadState = LoadState.Complete;
+            uiBattle = obj.GetComponent<BattleUI>();
+            onFinished?.Invoke();
+        });
     }
 
     public void OnDestroy()

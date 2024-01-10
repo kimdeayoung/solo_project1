@@ -2,34 +2,41 @@ using System.Buffers;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Assertions;
 
+public struct BattleStartData
+{
+    public TRStage trStage;
+    public CharacterInfo playerCharacterInfo;
+}
+
 public class BattleController
 {
-    protected TRStage trStage;
-
-    protected BattleUIController battleUIController;
-
-    protected UserControllerData userControllerData;
+    protected BattleStartData battleStartData;
 
     protected BattleState currentBattleState;
 
-    public BattleUIController BattleUIController { get => battleUIController; }
-    public UserControllerData UserControllerData { get => userControllerData; set => userControllerData = value; }
+    protected BattleUIController battleUIController;
 
-    public BattleController(TRStage trStage)
+    protected BattleCharacter player;
+    protected List<BattleUnit> enemys;
+
+    public BattleUIController BattleUIController { get => battleUIController; }
+    public BattleCharacter Player { get => player; set => player = value; }
+    public BattleStartData BattleStartData { get => battleStartData; }
+
+    public BattleController(BattleStartData battleStartData)
     {
-        battleUIController = new BattleUIController(this, trStage);
-        this.trStage = trStage;
+        battleUIController = new BattleUIController(this);
+        enemys = new List<BattleUnit>();
+        this.battleStartData = battleStartData;
     }
 
     public void CrateBattleObjects()
     {
         SetBattleState(BattleStateType.BattleInit);
-
-
-        battleUIController.CreateBattleUI();
     }
 
     public void SetBattleState(BattleStateType type)
@@ -63,8 +70,6 @@ public class BattleController
 
     public void ClearData()
     {
-        userControllerData = null;
-
         battleUIController.OnDestroy();
         battleUIController = null;
     }

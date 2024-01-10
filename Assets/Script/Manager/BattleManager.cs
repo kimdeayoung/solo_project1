@@ -8,11 +8,11 @@ public class BattleManager : ManagerWithMono<BattleManager>
 
     public BattleController Controller { get => controller; }
 
-    public void StartBattle(TRStage trStage)
+    public void StartBattle(BattleStartData battleStartData)
     {
-        AddressableBundleLoader.Instance.LoadSceneAsync(trStage.SceneName, onFinished: () =>
+        AddressableBundleLoader.Instance.LoadSceneAsync(battleStartData.trStage.SceneName, onFinished: () =>
         {
-            controller = new BattleController(trStage);
+            controller = new BattleController(battleStartData);
             controller.CrateBattleObjects();
         });
     }
