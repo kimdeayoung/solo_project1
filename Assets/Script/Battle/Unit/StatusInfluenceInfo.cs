@@ -7,24 +7,31 @@ public class StatusInfluenceInfo
 {
     private BattleUnit owner;
 
-    private StatusInfluence[] _statusInfluences;
-    private int _InfluenceTypeCount;
+    private List<StatusInfluence> _statusInfluences;
 
     public StatusInfluenceInfo(BattleUnit owner)
     {
         this.owner = owner;
 
-        _InfluenceTypeCount = (int)CrowdControlType.Length;
-        _statusInfluences = new StatusInfluence[_InfluenceTypeCount];
+        _statusInfluences = new List<StatusInfluence>(16);
     }
 
     public void OnUpdate(float deltaTime)
     {
-        for (int i = 0; i < _InfluenceTypeCount; i++)
+        int influenceTypeCount = _statusInfluences.Count;
+        for (int i = 0; i < influenceTypeCount;)
         {
             if (_statusInfluences[i] != null)
             {
-                _statusInfluences[i].OnUpdate(deltaTime);
+                bool isRemoved = _statusInfluences[i].OnUpdate(deltaTime);
+                if (isRemoved)
+                {
+                    _statusInfluences.RemoveAtSwapBack(i);
+                }
+                else
+                {
+                    ++i;
+                }
             }
         }
     }

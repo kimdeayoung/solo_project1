@@ -13,11 +13,12 @@ public abstract class UnitStatus
     protected float atk;
     protected float def;
 
-    protected float moveSpeed;
-
     protected StatusInfluenceInfo influenceInfo;
 
-    public float MoveSpeed { get => moveSpeed; }
+    protected int stunCount;
+
+    public float MoveSpeed { get; protected set; }
+    public float Haste { get; protected set; }
 
     public UnitStatus(BattleUnit owner, UnitStat stat)
     {
@@ -33,7 +34,9 @@ public abstract class UnitStatus
         atk = stat.Atk;
         def = stat.Def;
 
-        moveSpeed = stat.MoveSpeed;
+        MoveSpeed = stat.MoveSpeed;
+        Haste = 0;
+        stunCount = 0;
     }
 
     public void OnUpdate(float deltaTime)
@@ -50,5 +53,21 @@ public abstract class UnitStatus
     public virtual UnitState GetUnitState()
     {
         return UnitState.Idle;
+    }
+
+    public void IncreaseStunCount()
+    {
+        if (stunCount++ == 0)
+        {
+            owner.BehaviourController.SetBehaviourState(UnitState.Stun);
+        }
+    }
+
+    public void DecreaseStunCount()
+    {
+        if (--stunCount == 0)
+        {
+            owner.BehaviourController.SetBehaviourState(UnitState.Idle);
+        }
     }
 }

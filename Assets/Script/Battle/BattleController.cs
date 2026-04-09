@@ -20,11 +20,11 @@ public class BattleController
 
     protected BattleUIController battleUIController;
 
-    protected BattleCharacter player;
+    protected Player player;
     protected List<BattleUnit> enemys;
 
     public BattleUIController BattleUIController { get => battleUIController; }
-    public BattleCharacter Player { get => player; set => player = value; }
+    public Player Player { get => player; set => player = value; }
     public BattleStartData BattleStartData { get => battleStartData; }
 
     public BattleController(BattleStartData battleStartData)

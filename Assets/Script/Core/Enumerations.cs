@@ -32,6 +32,7 @@ public enum UnitType
 public enum UnitState
 {
     Idle,
+    Stun,
 }
 
 public enum StageDifficultyType
@@ -60,9 +61,15 @@ public enum EventType
     CreateProjectile,
 }
 
-public enum CrowdControlType
+public enum StatusInfluenceType
 {
     Stun,
     Slow,
     Length,
+}
+
+public enum AddStatusInfluenceType
+{
+    Independent,
+    Stack,
 }

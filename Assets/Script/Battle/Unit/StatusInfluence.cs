@@ -1,15 +1,36 @@
+using NUnit.Framework;
 using UnityEngine;
 
 public abstract class StatusInfluence
 {
-    public abstract CrowdControlType InfluenceType { get; }
+    protected BattleUnit unit;
+    public abstract StatusInfluenceType InfluenceType { get; }
     public float Duration { get; protected set; }
 
-    public abstract void OnStart(BattleUnit unit);
-    public abstract void OnEnd(BattleUnit unit);
+    public virtual void OnStart(BattleUnit unit)
+    {
+        this.unit = unit;
+    }
 
-    public abstract void AddInfluence();
-    public abstract void RemoveInfluence();
+    protected abstract void OnEnd();
 
-    public abstract void OnUpdate(float deltaTime);
+    public virtual void AddInfluence(AddStatusInfluenceData data)
+    {
+        switch (data.addStatusInfluenceType)
+        {
+            case AddStatusInfluenceType.Independent:
+                Assert.True(false);
+                break;
+            case AddStatusInfluenceType.Stack:
+                Duration += data.duration;
+                break;
+        }
+    }
+
+    public virtual void RemoveInfluence()
+    {
+        Duration = 0.0f;
+    }
+
+    public abstract bool OnUpdate(float deltaTime);
 }

@@ -13,4 +13,7 @@ public abstract class UnitStat : ScriptableObject
 
     [SerializeField] private float _moveSpeed;
     public float MoveSpeed => _moveSpeed;
+
+    [SerializeField] private BaseActionDataSO[] _actionDatas;
+    public BaseActionDataSO[] ActionDatas => _actionDatas;
 }
