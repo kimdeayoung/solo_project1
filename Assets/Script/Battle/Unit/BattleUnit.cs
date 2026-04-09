@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class BattleUnit : MonoBehaviour
@@ -16,6 +14,7 @@ public abstract class BattleUnit : MonoBehaviour
     }
 
     public abstract void OnUpdate(float deltaTime);
+    public abstract void OnFixedUpdate(float fixedDeltaTime);
 
     public bool IsAlive()
     {
@@ -44,6 +43,10 @@ public abstract class BattleUnit : MonoBehaviour
     }
 
     public void RunAnimation(string animationName)
+    {
+    }
+
+    public virtual void Release()
     {
 
     }

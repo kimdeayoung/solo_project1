@@ -3,7 +3,7 @@ using UnityEngine;
 
 public abstract class BaseActionDataSO : ScriptableObject
 {
-    public abstract BaseActionType ActionType { get; }
+    public abstract ActionDataType ActionType { get; }
 
     [SerializeField] private float _coolTime;
     public float CoolTime => _coolTime;

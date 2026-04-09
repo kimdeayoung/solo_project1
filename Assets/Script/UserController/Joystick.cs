@@ -1,15 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
 
 public class Joystick : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDragHandler
 {
-    [SerializeField]
-    private RectTransform leverArea;
-    [SerializeField]
-    private RectTransform lever;
+    [SerializeField] private RectTransform leverArea;
+    [SerializeField] private RectTransform lever;
 
     private Vector3 leverInitialPos;
     private float areaRadius;
@@ -23,8 +18,8 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
 
     private void Awake()
     {
-        Assert.IsNotNull(leverArea);
-        Assert.IsNotNull(lever);
+        Debug.Assert(leverArea != null);
+        Debug.Assert(lever != null);
 
         leverInitialPos = lever.transform.localPosition;
         areaRadius = leverArea.rect.width * 0.5f;
@@ -33,6 +28,8 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
     public void OnPointerDown(PointerEventData eventData)
     {
         isTouchJoyStick = true;
+
+        ComputeLeverTransform(eventData);
     }
 
     public void OnPointerUp(PointerEventData eventData)
@@ -44,6 +41,11 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
     }
 
     public void OnDrag(PointerEventData eventData)
+    {
+        ComputeLeverTransform(eventData);
+    }
+
+    private void ComputeLeverTransform(PointerEventData eventData)
     {
         leverPos = eventData.position - (Vector2)leverArea.position;
         leverPos = Vector2.ClampMagnitude(leverPos, areaRadius);// 조이스틱 이동범위를 넘지않도록 조정

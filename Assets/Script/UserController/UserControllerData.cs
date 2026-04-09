@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public struct UserControllerData
+public readonly struct UserControllerData
 {
-    private Joystick joyStick;
-    private ActionBtn[] actionBtns;
+    private readonly Joystick joyStick;
+    private readonly ActionBtn[] actionBtns;
 
     public UserControllerData(Joystick joyStick, ActionBtn[] actionBtns)
     {

@@ -1,37 +1,26 @@
-using System.Buffers;
-using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 public struct BattleStartData
 {
     public TRStage trStage;
-    public CharacterInfo playerCharacterInfo;
 }
 
 public class BattleController
 {
-    protected BattleStartData battleStartData;
+    public BattleStartData BattleStartData { get; private set; }
+    protected BattleState _currentBattleState;
 
-    protected BattleState currentBattleState;
+    public BattleUIController BattleUIController { get; protected set; }
 
-    protected BattleUIController battleUIController;
-
-    protected Player player;
-    protected List<BattleUnit> enemys;
-
-    public BattleUIController BattleUIController { get => battleUIController; }
-    public Player Player { get => player; set => player = value; }
-    public BattleStartData BattleStartData { get => battleStartData; }
+    public readonly List<BattleUnit> _battleUnits = new List<BattleUnit>(256);
+    public IReadOnlyList<BattleUnit> BattleUnits => _battleUnits;
+    
 
     public BattleController(BattleStartData battleStartData)
     {
-        battleUIController = new BattleUIController(this);
-        enemys = new List<BattleUnit>();
-        this.battleStartData = battleStartData;
+        BattleUIController = new BattleUIController(this);
+        BattleStartData = battleStartData;
     }
 
     public void CrateBattleObjects()
@@ -44,33 +33,45 @@ public class BattleController
         switch (type)
         {
             case BattleStateType.BattleInit:
-                currentBattleState = new BattleInit(this);
+                _currentBattleState = new BattleInit(this);
                 break;
             case BattleStateType.Progress:
-                currentBattleState = new BattleProgress(this);
+                _currentBattleState = new BattleProgress(this);
                 break;
             case BattleStateType.Victory:
-                currentBattleState = new BattleVictory(this);
+                _currentBattleState = new BattleVictory(this);
                 break;
             case BattleStateType.Defeat:
-                currentBattleState = new BattleDefeat(this);
+                _currentBattleState = new BattleDefeat(this);
                 break;
             default:
-                Assert.IsTrue(false);
+                Debug.Assert(false);
                 break;
         }
+        _currentBattleState.StateEnter();
+    }
+
+    public void AddBattleUnit(BattleUnit battleUnit)
+    {
+        _battleUnits.Add(battleUnit);
     }
 
     public void Update()
     {
-        Assert.IsNotNull(currentBattleState);
+        Debug.Assert(_currentBattleState != null);
 
-        currentBattleState.StateUpdate();
+        float deltaTime = Time.deltaTime * TimeManager.Instance.GameSpeed;
+        _currentBattleState.StateUpdate(deltaTime);
+    }
+
+    public void FixedUpdate()
+    {
+        _currentBattleState.StateFixedUpdate(Time.fixedDeltaTime);
     }
 
     public void ClearData()
     {
-        battleUIController.OnDestroy();
-        battleUIController = null;
+        BattleUIController.OnDestroy();
+        BattleUIController = null;
     }
 }

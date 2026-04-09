@@ -14,9 +14,12 @@ namespace PlayerState
         {
         }
 
+        public override void OnFixedUpdate(float fixedDeltaTime)
+        {
+        }
+
         public override void OnEnd()
         {
-
         }
     }
 }

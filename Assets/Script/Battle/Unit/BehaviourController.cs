@@ -1,7 +1,5 @@
-using NUnit.Framework;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEngine.UI.GridLayoutGroup;
 
 public interface IBehaviourController
 {
@@ -10,6 +8,7 @@ public interface IBehaviourController
     IBehaviourController AddBehaviourState<T>(BattleUnit owner) where T : BehaviourState, new();
     void SetBehaviourState(UnitState state);
     void OnUpdate(float deltaTime);
+    void OnFixedUpdate(float fixedDeltaTime);
 }
 
 public class BehaviourController : IBehaviourController
@@ -31,12 +30,14 @@ public class BehaviourController : IBehaviourController
 
     public void SetBehaviourState(UnitState state)
     {
-        Assert.IsNotNull(CurrentState);
-        CurrentState.OnEnd();
+        if (CurrentState != null)
+        {
+            CurrentState.OnEnd();
+        }
 
         _behaviourStates.TryGetValue(state, out BehaviourState newState);
-        Assert.IsNotNull(newState);
-        Assert.IsFalse(newState.UnitState.Equals(state));
+        Debug.Assert(newState != null);
+        Debug.Assert(newState.UnitState.Equals(state));
 
         CurrentState = newState;
         CurrentState.OnStart();
@@ -44,7 +45,12 @@ public class BehaviourController : IBehaviourController
 
     public void OnUpdate(float deltaTime)
     {
-        Assert.IsNotNull(CurrentState);
+        Debug.Assert(CurrentState != null);
         CurrentState.OnUpdate(deltaTime);
+    }
+
+    public void OnFixedUpdate(float fixedDeltaTime)
+    {
+        CurrentState.OnFixedUpdate(fixedDeltaTime);
     }
 }

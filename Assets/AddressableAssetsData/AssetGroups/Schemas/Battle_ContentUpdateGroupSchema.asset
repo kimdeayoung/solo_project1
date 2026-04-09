@@ -9,12 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 148c5d51e2bd77e4fb9286910835abd1, type: 3}
-  m_Name: PlayerStatusStat
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerStatusStat
-  _hp: 100
-  _atk: 1
-  _def: 1
-  _moveSpeed: 8
-  _rotate: 480
-  _actionDatas: []
+  m_Script: {fileID: 11500000, guid: 5834b5087d578d24c926ce20cd31e6d6, type: 3}
+  m_Name: Battle_ContentUpdateGroupSchema
+  m_EditorClassIdentifier: 
+  m_Group: {fileID: 11400000, guid: 5296e54dc40971c4e898009987c2e19d, type: 2}
+  m_StaticContent: 0

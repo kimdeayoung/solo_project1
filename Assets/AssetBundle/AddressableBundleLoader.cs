@@ -1,25 +1,36 @@
+using Cysharp.Threading.Tasks;
+using NUnit.Framework.Internal;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Assertions;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.ResourceManagement.ResourceLocations;
 using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.UI;
 
 public class AddressableBundleLoader : Singleton<AddressableBundleLoader>
 {
-    private Dictionary<string, AsyncOperationHandle<UnityEngine.Object>> operationHandles;
+    private Dictionary<string, AsyncOperationHandle> operationHandles;
 
     private AtlasManagement atlasManagement;
 
     public void InitInstance()
     {
-        operationHandles = new Dictionary<string, AsyncOperationHandle<UnityEngine.Object>>(256);
+        operationHandles = new Dictionary<string, AsyncOperationHandle>(256);
 
         atlasManagement = new AtlasManagement();
+
+        LoadAssetsAsync("IngamePrefab").Forget();
+    }
+
+    private void Test(GameObject obj)
+    {
+    }
+    private void Test2(GameObject obj)
+    {
+
     }
 
     public bool IsCachedAsset(string assetName)
@@ -35,64 +46,92 @@ public class AddressableBundleLoader : Singleton<AddressableBundleLoader>
         }
         else
         {
-            AsyncOperationHandle<UnityEngine.Object> handle = Addressables.LoadAssetAsync<UnityEngine.Object>(assetName);
-            handle.Completed += (AsyncOperationHandle<UnityEngine.Object> result) =>
+            AsyncOperationHandle<T> handle = Addressables.LoadAssetAsync<T>(assetName);
+            handle.Completed += (AsyncOperationHandle<T> result) =>
             {
                 switch (handle.Status)
                 {
                     case AsyncOperationStatus.Succeeded:
-                        operationHandles.Add(assetName, result);
-                        successAction?.Invoke((T)handle.Result);
+                        Debug.Assert(!operationHandles.ContainsKey(assetName));
+#if UNITY_EDITOR
+                        bool added = operationHandles.TryAdd(assetName, result);
+                        Debug.Assert(added);
+#else
+                        operationHandles.TryAdd(assetName, result);
+#endif
+                        successAction?.Invoke(handle.Result);
                         break;
                     case AsyncOperationStatus.Failed:
                         failedAction?.Invoke();
                         Addressables.Release(handle);
                         break;
                 }
+
+                
             };
         }
     }
 
-    public T LoadAsset<T>(string assetName, Action failedAction = null) where T : UnityEngine.Object
+    public async UniTaskVoid LoadAssetsAsync(string labelName, Action onFinished = null)
     {
-        if (operationHandles.ContainsKey(assetName))
+        //Assert.IsTrue(AddressablePath.BundleLabels.Contains(labelName), $"Check addressableLabel is Exist addressableLabel : {labelName}");
+        AsyncOperationHandle<IList<IResourceLocation>> locationsHandle = Addressables.LoadResourceLocationsAsync(labelName);
+
+        IList<IResourceLocation> locations = await locationsHandle.ToUniTask();
+
+        var loadOps = new List<AsyncOperationHandle>(locationsHandle.Result.Count);
+
+        foreach (IResourceLocation location in locations)
         {
-            return (T)operationHandles[assetName].Result;
-        }
-        else
-        {
-            AsyncOperationHandle<UnityEngine.Object> handle = Addressables.LoadAssetAsync<UnityEngine.Object>(assetName);
-            switch (handle.Status)
+            AsyncOperationHandle<UnityEngine.Object> handle = Addressables.LoadAssetAsync<UnityEngine.Object>(location);
+            handle.Completed += (AsyncOperationHandle<UnityEngine.Object> result) =>
             {
-                case AsyncOperationStatus.Succeeded:
-                    operationHandles.Add(assetName, handle);
-                    return (T)handle.Result;
-                default:
-                    failedAction?.Invoke();
-                    Addressables.Release(handle);
-                    return null;
-            }
+                string assetName = location.PrimaryKey;
+                Debug.Assert(!operationHandles.ContainsKey(assetName));
+#if UNITY_EDITOR
+                bool added = operationHandles.TryAdd(assetName, result);
+                Debug.Assert(added);
+#else
+                operationHandles.TryAdd(assetName, result);
+#endif
+            };
+            loadOps.Add(handle);
         }
+
+        await Addressables.ResourceManager.CreateGenericGroupOperation(loadOps, true);
+
+        onFinished?.Invoke();
     }
 
-    public void LoadAssetsAsync(string labelName, Action onFinished = null)
+    public async UniTaskVoid LoadAssetsAsync(IReadOnlyList<string> labelNames, Addressables.MergeMode mergeMode, Action onFinished = null)
     {
-        Assert.IsTrue(AddressablePath.BundleLabels.Contains(labelName), $"Check addressableLabel is Exist addressableLabel : {labelName}");
+        AsyncOperationHandle<IList<IResourceLocation>> locationsHandle = Addressables.LoadResourceLocationsAsync(labelNames, mergeMode);
 
-        //var handle = Addressables.LoadAssetsAsync(labelName, (UnityEngine.Object obj) =>
-        //{
-        //    if (_bundleCacheObjs.TryAdd(obj.name, obj) == false)
-        //    {
-        //        _duplicateBundleNames.Add(obj.name);
-        //    }
-        //});
-        //
-        //_bundleAssetsHandles.Add(labelName, handle);
-        //
-        //handle.Completed += (AsyncOperationHandle<IList<UnityEngine.Object>> obj) =>
-        //{
-        //    onFinished?.Invoke();
-        //};
+        IList<IResourceLocation> locations = await locationsHandle.ToUniTask();
+
+        var loadOps = new List<AsyncOperationHandle>(locationsHandle.Result.Count);
+
+        foreach (IResourceLocation location in locations)
+        {
+            AsyncOperationHandle<UnityEngine.Object> handle = Addressables.LoadAssetAsync<UnityEngine.Object>(location);
+            handle.Completed += (AsyncOperationHandle<UnityEngine.Object> result) =>
+            {
+                string assetName = location.PrimaryKey;
+                Debug.Assert(!operationHandles.ContainsKey(assetName));
+#if UNITY_EDITOR
+                bool added = operationHandles.TryAdd(assetName, result);
+                Debug.Assert(added);
+#else
+                operationHandles.TryAdd(assetName, result);
+#endif
+                Addressables.Release(handle);
+            };
+            loadOps.Add(handle);
+        }
+
+        await Addressables.ResourceManager.CreateGenericGroupOperation(loadOps, true);
+
+        onFinished?.Invoke();
     }
 
     public void LoadSceneAsync(string sceneName, UnityEngine.SceneManagement.LoadSceneMode loadSceneMode = UnityEngine.SceneManagement.LoadSceneMode.Single, bool activeOnLoad = true, Action onFinished = null)
@@ -111,31 +150,6 @@ public class AddressableBundleLoader : Singleton<AddressableBundleLoader>
         {
             onFinished?.Invoke();
         };
-    }
-
-    /// <summary>
-    /// 에셋 로드 밑 캐싱이 완료된 경우에만 null이 아닌 instantiateObj 리턴
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="key"></param>
-    /// <param name="parentTrans"></param>
-    /// <returns></returns>
-    public GameObject InstantiateOrNull(string key, Transform parentTrans)
-    {
-        if (operationHandles.ContainsKey(key))
-        {
-            var operation = Addressables.InstantiateAsync(key, parentTrans);
-            operation.WaitForCompletion();
-
-            switch (operation.Status)
-            {
-                case AsyncOperationStatus.Succeeded:
-                    return operation.Result;
-                default:
-                    return null;
-            }
-        }
-        return null;
     }
 
     /// <summary>
@@ -167,11 +181,6 @@ public class AddressableBundleLoader : Singleton<AddressableBundleLoader>
         }
     }
 
-    public void LoadSpriteAtlas(string atlasName)
-    {
-        atlasManagement.LoadSpriteAtlas(atlasName);
-    }
-
     public void LoadSpriteAtlasAsync(string atlasName, Action onFinished = null)
     {
         atlasManagement.LoadSpriteAtlasAsync(atlasName, onFinished);
@@ -193,12 +202,17 @@ public class AddressableBundleLoader : Singleton<AddressableBundleLoader>
         return sprite;
     }
 
-    public void SetRawSprite(RawImage image, string rawSpriteName)
+    public void SetRawSpriteAsync(RawImage image, string rawSpriteName, Action onSuccess, Action onFailed)
     {
         Assert.IsFalse(string.IsNullOrEmpty(rawSpriteName), "RawSpriteName is Null or Empty");
-        Texture texture = LoadAsset<Texture>(rawSpriteName);
-        Assert.IsNotNull(texture, $"RawSprite Can't Find RawSpriteName Name : {rawSpriteName}");
-        image.texture = texture;
+        LoadAssetAsync(rawSpriteName, (Texture texture) =>
+        {
+            if (image != null)
+            {
+                image.texture = texture;
+            }
+            onSuccess?.Invoke();
+        }, onFailed);
     }
 
     public List<string> GetSpriteNamesOrNull(string atlasName)
@@ -222,24 +236,6 @@ public class AddressableBundleLoader : Singleton<AddressableBundleLoader>
             Addressables.Release(handle);
             operationHandles.Remove(assetName);
         }
-    }
-
-    public void ReleaseLoadedAssets(string addressableLabel)
-    {
-        //AsyncOperationHandle<IList<UnityEngine.Object>> handle;
-        //if (_bundleAssetsHandles.Remove(addressableLabel, out handle))
-        //{
-        //    foreach (var obj in handle.Result)
-        //    {
-        //        string objName = obj.name;
-        //        if (_duplicateBundleNames.Contains(objName) == false)
-        //        {
-        //            _bundleCacheObjs.Remove(objName);
-        //        }
-        //    }
-        //
-        //    Addressables.Release(handle);
-        //}
     }
 
     public void ReleaseAllAssets()

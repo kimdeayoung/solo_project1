@@ -12,7 +12,7 @@ public abstract class BattleState
     }
 
     public abstract void StateEnter();
-    public abstract void StateUpdate();
+    public abstract void StateUpdate(float deltaTime);
+    public abstract void StateFixedUpdate(float fixedDeltaTime);
     public abstract void StateExit();
-
 }

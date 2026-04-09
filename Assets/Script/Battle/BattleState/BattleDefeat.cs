@@ -18,8 +18,11 @@ public class BattleDefeat : BattleState
 
     }
 
-    public override void StateUpdate()
+    public override void StateUpdate(float deltaTime)
     {
+    }
 
+    public override void StateFixedUpdate(float fixedDeltaTime)
+    {
     }
 }

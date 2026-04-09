@@ -1,11 +1,5 @@
 using UnityEngine;
 
-public enum BaseActionType
-{
-    Default,
-    Random,
-}
-
 public enum ActionResourceType
 {
     None,
@@ -22,5 +16,6 @@ public enum ActionDataType
 public enum ActionParameterType
 {
     Projectile,
+    ApplyStatus,
     Length,
 }

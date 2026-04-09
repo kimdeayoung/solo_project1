@@ -14,6 +14,9 @@ public abstract class UnitStat : ScriptableObject
     [SerializeField] private float _moveSpeed;
     public float MoveSpeed => _moveSpeed;
 
-    [SerializeField] private BaseActionDataSO[] _actionDatas;
+    [SerializeField] private float _rotate;
+    public float Rotate => _rotate;
+
+    [SerializeField] private BaseActionDataSO[] _actionDatas = System.Array.Empty<BaseActionDataSO>();
     public BaseActionDataSO[] ActionDatas => _actionDatas;
 }

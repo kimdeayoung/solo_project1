@@ -1,8 +1,8 @@
-using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEngine;
+using Unity.Profiling;
 using UnityEngine.Assertions;
+using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class GameManager : ManagerWithMono<GameManager>
 {
@@ -15,6 +15,24 @@ public class GameManager : ManagerWithMono<GameManager>
         updateableManagers = new List<IUpdateableManager>(8);
 
         Tables.Instance.LoadTables_Binary();
+
+        AddressableBundleLoader.Instance.InitInstance();
+        DontDestroyOnLoad(this);
+
+        //SceneManager.activeSceneChanged += ActiveSceneChanged;
+    }
+
+    public void Update()
+    {
+        if (Keyboard.current.qKey.wasPressedThisFrame)
+        {
+            AddressableBundleLoader.Instance.ReleaseLoadedAsset("Player");
+        }
+    }
+
+    private void ActiveSceneChanged(Scene current, Scene next)
+    {
+
     }
 
     public void RegisterManager(IManager manager)

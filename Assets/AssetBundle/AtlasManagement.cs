@@ -67,14 +67,6 @@ public class AtlasManagement
         _atalsInfos = new List<AtlasInfo>();
     }
 
-    public void LoadSpriteAtlas(string atlasName)
-    {
-        if (AddressableBundleLoader.Instance.IsCachedAsset(atlasName) == false)
-        {
-            _atalsInfos.Add(new AtlasInfo(atlasName, AddressableBundleLoader.Instance.LoadAsset<SpriteAtlas>(atlasName)));
-        }
-    }
-
     public void LoadSpriteAtlasAsync(string atlasName, Action onFinished = null)
     {
         if (AddressableBundleLoader.Instance.IsCachedAsset(atlasName) == false)
