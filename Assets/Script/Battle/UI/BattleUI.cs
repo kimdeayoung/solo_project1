@@ -10,7 +10,11 @@ public class BattleUI : MonoBehaviour
     [SerializeField]
     private Joystick joyStick;
 
+    [SerializeField]
+    private ActionBtn[] actionBtns;
+
     public Joystick JoyStick { get => joyStick; }
+    public ActionBtn[] ActionBtns { get => actionBtns; }
 
     private void Awake()
     {

@@ -19,7 +19,13 @@ public class TableConverter : EditorWindow
 
     private static void TableConvert()
     {
-        Tables.Instance.ConvertLocalTableToBinary();
+        bool convertResult = false;
+        convertResult = Tables.Instance.ConvertLocalTableToBinary();
+
+        if (convertResult)
+        {
+            Debug.Log("Convert Success");
+        }
     }
 
     public void OnGUI()

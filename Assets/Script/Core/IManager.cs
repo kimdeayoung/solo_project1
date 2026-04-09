@@ -49,7 +49,7 @@ public abstract class ManagerWithMono<T> : MonoBehaviour, IManager where T : Com
 		{
 			if (instance == null)
 			{
-				instance = FindObjectOfType<T>();
+				instance = FindAnyObjectByType<T>();
 				if (instance == null)
 				{
 					GameObject go = new GameObject(typeof(T).ToString() + " (Singleton)");
@@ -111,8 +111,8 @@ public abstract class UpdateableManagerWithMono<T> : MonoBehaviour, IUpdateableM
 		{
 			if (instance == null)
 			{
-				instance = FindObjectOfType<T>();
-			}
+                instance = FindAnyObjectByType<T>();
+            }
 			return instance;
 		}
 	}

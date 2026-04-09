@@ -18,7 +18,6 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
 
     private bool isTouchJoyStick;
 
-    
     public Vector2 LeverPos { get => leverPos; }
     public bool IsTouchJoyStick { get => isTouchJoyStick; }
 
@@ -27,7 +26,7 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
         Assert.IsNotNull(leverArea);
         Assert.IsNotNull(lever);
 
-        leverInitialPos = lever.transform.position;
+        leverInitialPos = lever.transform.localPosition;
         areaRadius = leverArea.rect.width * 0.5f;
     }
 
@@ -40,7 +39,7 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
     {
         isTouchJoyStick = false;
 
-        lever.transform.position = leverInitialPos;
+        lever.transform.localPosition = leverInitialPos;
         leverPos = Vector2.zero;
     }
 

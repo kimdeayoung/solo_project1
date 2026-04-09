@@ -29,13 +29,13 @@ public class BattleInit : BattleState
 
     public override void StateEnter()
     {
-        AddressableBundleLoader.Instance.InstantiateAsync(controller.BattleStartData.playerCharacterInfo.PrefabName, null, (GameObject obj) =>
-        {
-            controller.Player = obj.GetComponent<BattleCharacter>();
-            Assert.IsNotNull(controller.Player);
-
-            loadStates[BattleLoadType.Player] = LoadState.Complete;
-        });
+        //AddressableBundleLoader.Instance.InstantiateAsync(controller.BattleStartData.playerCharacterInfo.PrefabName, null, (GameObject obj) =>
+        //{
+        //    controller.Player = obj.GetComponent<BattleCharacter>();
+        //    Assert.IsNotNull(controller.Player);
+        //
+        //    loadStates[BattleLoadType.Player] = LoadState.Complete;
+        //});
 
         battleUIController.CreateBattleUI(OnFinishedCreateBattleUI);
     }
@@ -60,7 +60,7 @@ public class BattleInit : BattleState
 
     public override void StateExit()
     {
-        controller.Player.UserControllerData = new UserControllerData(battleUIController.Joystick);
+        controller.Player.UserControllerData = new UserControllerData(battleUIController.Joystick, battleUIController.ActionBtns);
     }
 
     private void OnFinishedCreateBattleUI()

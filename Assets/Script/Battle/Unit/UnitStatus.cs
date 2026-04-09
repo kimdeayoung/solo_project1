@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Assertions;
 
 public abstract class UnitStatus
 {
@@ -8,26 +10,45 @@ public abstract class UnitStatus
     protected int hp;
     protected int maxHp;
 
-    protected uint atk;
-    protected uint def;
+    protected float atk;
+    protected float def;
 
     protected float moveSpeed;
 
     protected StatusInfluenceInfo influenceInfo;
 
-    public UnitStatus(BattleUnit owner)
+    public float MoveSpeed { get => moveSpeed; }
+
+    public UnitStatus(BattleUnit owner, UnitStat stat)
     {
         this.owner = owner;
         influenceInfo = new StatusInfluenceInfo(owner);
+
+        ApplyStat(stat);
     }
 
-    public void Update()
+    protected virtual void ApplyStat(UnitStat stat)
     {
-        influenceInfo.Update();
+        maxHp = hp = stat.Hp;
+        atk = stat.Atk;
+        def = stat.Def;
+
+        moveSpeed = stat.MoveSpeed;
+    }
+
+    public void OnUpdate(float deltaTime)
+    {
+        Assert.IsNotNull(influenceInfo);
+        influenceInfo.OnUpdate(deltaTime);
     }
 
     public bool IsAlive()
     {
         return hp > 0;
+    }
+
+    public virtual UnitState GetUnitState()
+    {
+        return UnitState.Idle;
     }
 }

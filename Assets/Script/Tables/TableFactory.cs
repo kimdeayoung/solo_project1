@@ -15,12 +15,6 @@ public class TableFactory
 
         switch (tableType)
         {
-            case TableType.Skill:
-                trFoundation = new TRSkill();
-                break;
-            case TableType.SkillEvent:
-                trFoundation = new TRSkillEvent();
-                break;
             case TableType.Stage:
                 trFoundation = new TRStage();
                 break;

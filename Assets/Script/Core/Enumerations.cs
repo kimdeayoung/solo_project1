@@ -1,7 +1,5 @@
 public enum TableType
 {
-    Skill,
-    SkillEvent,
     Stage,
     Length,
 }
@@ -29,6 +27,11 @@ public enum UnitType
 {
     Character,
 
+}
+
+public enum UnitState
+{
+    Idle,
 }
 
 public enum StageDifficultyType

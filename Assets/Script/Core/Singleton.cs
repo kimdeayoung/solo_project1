@@ -29,7 +29,7 @@ public abstract class SingletonWithMono<T> : MonoBehaviour where T : Component
         {
             if (_instance == null)
             {
-                _instance = FindObjectOfType<T>();
+                _instance = FindAnyObjectByType<T>();
                 if (_instance == null)
                 {
                     GameObject go = new GameObject(typeof(T).ToString() + " (Singleton)");

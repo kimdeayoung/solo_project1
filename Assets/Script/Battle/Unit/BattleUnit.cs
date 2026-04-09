@@ -5,13 +5,18 @@ using UnityEngine;
 public abstract class BattleUnit : MonoBehaviour
 {
     protected UnitStatus status;
-    protected UnitStatus baseStatus;
-    protected BattleSkill[] skills;
 
-    public abstract void Init(Unit unit);
+    public virtual void Init()
+    {
+    }
 
     public bool IsAlive()
     {
         return status.IsAlive();
+    }
+
+    public UnitState GetUnitState()
+    {
+        return status.GetUnitState();
     }
 }

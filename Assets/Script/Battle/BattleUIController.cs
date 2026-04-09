@@ -11,6 +11,7 @@ public class BattleUIController
     private BattleUI uiBattle;
 
     public Joystick Joystick { get => uiBattle.JoyStick; }
+    public ActionBtn[] ActionBtns { get => uiBattle.ActionBtns; }
 
     public BattleUIController(BattleController controller)
     {

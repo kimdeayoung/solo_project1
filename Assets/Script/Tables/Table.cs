@@ -16,26 +16,28 @@ public class Table
         this.type = type;
     }
 
-    public void LoadTable(TableLoadType loadType, in string loadTablePath)
+    public bool LoadTable(TableLoadType loadType, in string loadTablePath)
     {
         if (File.Exists(loadTablePath) == false)
         {
             Debug.LogError($"can't find Table, path: {loadTablePath}");
-            return;
+            return false;
         }
 
+        bool isLoadSuccess = true;
         switch (loadType)
         {
             case TableLoadType.Local:
-                LoadTableXml(loadTablePath);
+                isLoadSuccess &= LoadTableXml(loadTablePath);
                 break;
             case TableLoadType.Binary:
                 LoadTableBinary(loadTablePath);
                 break;
         }
+        return isLoadSuccess;
     }
 
-    private void LoadTableXml(in string loadTablePath)
+    private bool LoadTableXml(in string loadTablePath)
     {
         XmlReaderSettings settings = XmlHelper.GetDefaultReadSetting();
         XmlReader reader = XmlReader.Create(loadTablePath, settings);
@@ -43,13 +45,14 @@ public class Table
         string typeString = type.ToString();
         List<TRFoundation> foundations = new List<TRFoundation>();
 
+        bool isLoadSuccess = true;
         while (reader.EOF == false)
         {
             if (reader.IsStartElement(typeString))
             {
                 reader.ReadStartElement(typeString);
                 TRFoundation trFoundation = TableFactory.CreateTRFoundation(type);
-                trFoundation.ReadRawData(reader);
+                isLoadSuccess &= trFoundation.ReadRawData(reader);
                 reader.ReadEndElement();
 
                 foundations.Add(trFoundation);
@@ -62,6 +65,8 @@ public class Table
 
         reader.Close();
         trFoundations = foundations.ToArray();
+
+        return isLoadSuccess;
     }
 
     private void LoadTableBinary(in string loadTablePath)
@@ -88,7 +93,7 @@ public class Table
         }
     }
 
-    public void WriteDataToBinaryFile(in string writeBinaryPath)
+    public bool WriteDataToBinaryFile(in string writeBinaryPath)
     {
         Assert.IsNotNull(trFoundations);
         if (File.Exists(writeBinaryPath))
@@ -96,6 +101,7 @@ public class Table
             File.Delete(writeBinaryPath);
         }
 
+        bool isWriteSuccess = true;
         MemoryStream memory = new MemoryStream();
         BinaryWriter writer = new BinaryWriter(memory);
         {
@@ -112,6 +118,7 @@ public class Table
             var bytes = memory.ToArray();
             File.WriteAllBytes(writeBinaryPath, bytes);
         }
+        return isWriteSuccess;
     }
 
     public T GetRecordOrNull<T>(uint index) where T : TRFoundation

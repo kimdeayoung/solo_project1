@@ -7,49 +7,30 @@ public class StatusInfluenceInfo
 {
     private BattleUnit owner;
 
-
-    private float[] applyCrowdControlTimes;
+    private StatusInfluence[] _statusInfluences;
+    private int _InfluenceTypeCount;
 
     public StatusInfluenceInfo(BattleUnit owner)
     {
         this.owner = owner;
 
-
-        applyCrowdControlTimes = new float[(int)CrowdControlType.Length];
+        _InfluenceTypeCount = (int)CrowdControlType.Length;
+        _statusInfluences = new StatusInfluence[_InfluenceTypeCount];
     }
 
-    public void Update()
+    public void OnUpdate(float deltaTime)
     {
-
-
-        for (int i = 0; i < applyCrowdControlTimes.Length; ++i)
+        for (int i = 0; i < _InfluenceTypeCount; i++)
         {
-            if (applyCrowdControlTimes[i] > 0.0f)
+            if (_statusInfluences[i] != null)
             {
-                applyCrowdControlTimes[i] -= Time.deltaTime;
-                if (applyCrowdControlTimes[i] <= 0.0f)
-                {
-                    applyCrowdControlTimes[i] = 0.0f;
-                }
+                _statusInfluences[i].OnUpdate(deltaTime);
             }
         }
     }
 
-    public void ApplyCrowdControl(CrowdControlType type, float time)
+    public void OnAddStatusInfluence()
     {
-        Assert.IsFalse(type == CrowdControlType.Length);
 
-        int typeIndex = (int)type;
-        if (applyCrowdControlTimes[typeIndex] > time)
-        {
-            return;
-        }
-
-        applyCrowdControlTimes[typeIndex] = time;
-    }
-
-    public bool IsApplyCrowdControl(CrowdControlType type)
-    {
-        return applyCrowdControlTimes[(int)type] > 0.0f;
     }
 }

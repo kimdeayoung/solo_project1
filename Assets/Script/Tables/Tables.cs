@@ -17,8 +17,9 @@ public class Tables : Singleton<Tables>
     }
 
 #if UNITY_EDITOR
-    public void ConvertLocalTableToBinary()
+    public bool ConvertLocalTableToBinary()
     {
+        bool isConvertSuccess = true;
         foreach (TableType type in Enum.GetValues(typeof(TableType)))
         {
             if (type == TableType.Length)
@@ -27,10 +28,11 @@ public class Tables : Singleton<Tables>
             }
 
             Table table = new Table(type);
-            table.LoadTable(TableLoadType.Local, Application.dataPath + "/Tables/" + type + "Table.xml");
+            isConvertSuccess &= table.LoadTable(TableLoadType.Local, Application.dataPath + "/Tables/" + type + "Table.xml");
 
-            table.WriteDataToBinaryFile(tableRoot + type + ".bytes");
+            isConvertSuccess &= table.WriteDataToBinaryFile(tableRoot + type + ".bytes");
         }
+        return isConvertSuccess;
     }
 #endif
 
