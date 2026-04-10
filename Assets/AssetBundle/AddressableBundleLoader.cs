@@ -1,5 +1,4 @@
 using Cysharp.Threading.Tasks;
-using NUnit.Framework.Internal;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,30 +6,31 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.Assertions;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceLocations;
-using UnityEngine.ResourceManagement.ResourceProviders;
-using UnityEngine.UI;
+
+public readonly struct LoadLabelsData
+{
+    public readonly IReadOnlyList<string> labels;
+    public readonly Addressables.MergeMode mergeMode;
+
+    public LoadLabelsData(IReadOnlyList<string> labels, Addressables.MergeMode mergeMode)
+    {
+        this.labels = labels;
+        this.mergeMode = mergeMode;
+    }
+}
 
 public class AddressableBundleLoader : Singleton<AddressableBundleLoader>
 {
     private Dictionary<string, AsyncOperationHandle> operationHandles;
 
     private AtlasManagement atlasManagement;
+    public AtlasManagement AtlasManagement => atlasManagement;
 
     public void InitInstance()
     {
         operationHandles = new Dictionary<string, AsyncOperationHandle>(256);
 
         atlasManagement = new AtlasManagement();
-
-        LoadAssetsAsync("IngamePrefab").Forget();
-    }
-
-    private void Test(GameObject obj)
-    {
-    }
-    private void Test2(GameObject obj)
-    {
-
     }
 
     public bool IsCachedAsset(string assetName)
@@ -38,7 +38,7 @@ public class AddressableBundleLoader : Singleton<AddressableBundleLoader>
         return operationHandles.ContainsKey(assetName);
     }
 
-    public void LoadAssetAsync<T>(string assetName, Action<T> successAction, Action failedAction = null) where T : UnityEngine.Object
+    public void LoadAssetAsync<T>(string assetName, Action<T> successAction, Action<string> failedAction = null) where T : UnityEngine.Object
     {
         if (operationHandles.ContainsKey(assetName))
         {
@@ -49,7 +49,7 @@ public class AddressableBundleLoader : Singleton<AddressableBundleLoader>
             AsyncOperationHandle<T> handle = Addressables.LoadAssetAsync<T>(assetName);
             handle.Completed += (AsyncOperationHandle<T> result) =>
             {
-                switch (handle.Status)
+                switch (result.Status)
                 {
                     case AsyncOperationStatus.Succeeded:
                         Debug.Assert(!operationHandles.ContainsKey(assetName));
@@ -62,19 +62,34 @@ public class AddressableBundleLoader : Singleton<AddressableBundleLoader>
                         successAction?.Invoke(handle.Result);
                         break;
                     case AsyncOperationStatus.Failed:
-                        failedAction?.Invoke();
+                        failedAction?.Invoke(assetName);
                         Addressables.Release(handle);
                         break;
                 }
-
-                
             };
         }
     }
 
-    public async UniTaskVoid LoadAssetsAsync(string labelName, Action onFinished = null)
+    public async UniTask<int> GetResourceLocationCount(string labelName)
     {
-        //Assert.IsTrue(AddressablePath.BundleLabels.Contains(labelName), $"Check addressableLabel is Exist addressableLabel : {labelName}");
+        AsyncOperationHandle<IList<IResourceLocation>> locationsHandle = Addressables.LoadResourceLocationsAsync(labelName);
+
+        IList<IResourceLocation> locations = await locationsHandle.ToUniTask();
+        Addressables.Release(locationsHandle);
+        return locations.Count;
+    }
+
+    public async UniTask<int> GetResourceLocationCount(IReadOnlyList<string> labelNames, Addressables.MergeMode mergeMode)
+    {
+        AsyncOperationHandle<IList<IResourceLocation>> locationsHandle = Addressables.LoadResourceLocationsAsync(labelNames, mergeMode);
+
+        IList<IResourceLocation> locations = await locationsHandle.ToUniTask();
+        Addressables.Release(locationsHandle);
+        return locations.Count;
+    }
+
+    public async UniTask LoadAssetsAsync(string labelName, Action<UnityEngine.Object> onAssetLoadEnd, Action onFinished = null)
+    {
         AsyncOperationHandle<IList<IResourceLocation>> locationsHandle = Addressables.LoadResourceLocationsAsync(labelName);
 
         IList<IResourceLocation> locations = await locationsHandle.ToUniTask();
@@ -94,18 +109,19 @@ public class AddressableBundleLoader : Singleton<AddressableBundleLoader>
 #else
                 operationHandles.TryAdd(assetName, result);
 #endif
+                onAssetLoadEnd?.Invoke(result.Result);
             };
             loadOps.Add(handle);
         }
 
-        await Addressables.ResourceManager.CreateGenericGroupOperation(loadOps, true);
+        await Addressables.ResourceManager.CreateGenericGroupOperation(loadOps, false);
 
         onFinished?.Invoke();
     }
 
-    public async UniTaskVoid LoadAssetsAsync(IReadOnlyList<string> labelNames, Addressables.MergeMode mergeMode, Action onFinished = null)
+    public async UniTask LoadAssetsAsync(LoadLabelsData data, Action<UnityEngine.Object> onAssetLoadEnd, Action onFinished = null)
     {
-        AsyncOperationHandle<IList<IResourceLocation>> locationsHandle = Addressables.LoadResourceLocationsAsync(labelNames, mergeMode);
+        AsyncOperationHandle<IList<IResourceLocation>> locationsHandle = Addressables.LoadResourceLocationsAsync(data.labels, data.mergeMode);
 
         IList<IResourceLocation> locations = await locationsHandle.ToUniTask();
 
@@ -124,7 +140,7 @@ public class AddressableBundleLoader : Singleton<AddressableBundleLoader>
 #else
                 operationHandles.TryAdd(assetName, result);
 #endif
-                Addressables.Release(handle);
+                onAssetLoadEnd?.Invoke(result.Result);
             };
             loadOps.Add(handle);
         }
@@ -136,17 +152,17 @@ public class AddressableBundleLoader : Singleton<AddressableBundleLoader>
 
     public void LoadSceneAsync(string sceneName, UnityEngine.SceneManagement.LoadSceneMode loadSceneMode = UnityEngine.SceneManagement.LoadSceneMode.Single, bool activeOnLoad = true, Action onFinished = null)
     {
-        AsyncOperationHandle<SceneInstance> handle = Addressables.LoadSceneAsync(sceneName, loadSceneMode, activeOnLoad);
-        handle.Completed += (AsyncOperationHandle<SceneInstance> obj) =>
+        AsyncOperationHandle<UnityEngine.ResourceManagement.ResourceProviders.SceneInstance> handle = Addressables.LoadSceneAsync(sceneName, loadSceneMode, activeOnLoad);
+        handle.Completed += (AsyncOperationHandle<UnityEngine.ResourceManagement.ResourceProviders.SceneInstance> obj) =>
         {
             onFinished?.Invoke();
         };
     }
 
-    public void ReleaseScene(SceneInstance scene, Action onFinished = null)
+    public void ReleaseScene(UnityEngine.ResourceManagement.ResourceProviders.SceneInstance scene, Action onFinished = null)
     {
-        AsyncOperationHandle<SceneInstance> handle = Addressables.UnloadSceneAsync(scene);
-        handle.Completed += (AsyncOperationHandle<SceneInstance> result) =>
+        AsyncOperationHandle<UnityEngine.ResourceManagement.ResourceProviders.SceneInstance> handle = Addressables.UnloadSceneAsync(scene);
+        handle.Completed += (AsyncOperationHandle<UnityEngine.ResourceManagement.ResourceProviders.SceneInstance> result) =>
         {
             onFinished?.Invoke();
         };
@@ -181,43 +197,9 @@ public class AddressableBundleLoader : Singleton<AddressableBundleLoader>
         }
     }
 
-    public void LoadSpriteAtlasAsync(string atlasName, Action onFinished = null)
+    public void LoadSpriteAtlasAsync(string atlasName, Action<string> onFinished = null)
     {
         atlasManagement.LoadSpriteAtlasAsync(atlasName, onFinished);
-    }
-
-    public void SetAtlasSprite(Image image, string spriteName)
-    {
-        Assert.IsFalse(string.IsNullOrEmpty(spriteName), "spriteName is Null or Empty");
-
-        Sprite sprite = atlasManagement.GetSpriteOrNull(spriteName);
-
-        Assert.IsNotNull(sprite, $"Sprite Can't Find Check Atlas Or SpriteName Name : {spriteName}");
-        image.sprite = sprite;
-    }
-
-    public Sprite GetAtlasSprite(string spriteName)
-    {
-        Sprite sprite = atlasManagement.GetSpriteOrNull(spriteName);
-        return sprite;
-    }
-
-    public void SetRawSpriteAsync(RawImage image, string rawSpriteName, Action onSuccess, Action onFailed)
-    {
-        Assert.IsFalse(string.IsNullOrEmpty(rawSpriteName), "RawSpriteName is Null or Empty");
-        LoadAssetAsync(rawSpriteName, (Texture texture) =>
-        {
-            if (image != null)
-            {
-                image.texture = texture;
-            }
-            onSuccess?.Invoke();
-        }, onFailed);
-    }
-
-    public List<string> GetSpriteNamesOrNull(string atlasName)
-    {
-        return atlasManagement.GetSpriteNamesOrNull(atlasName);
     }
 
     public void DestroyInstantiateObj(GameObject obj)
@@ -229,13 +211,39 @@ public class AddressableBundleLoader : Singleton<AddressableBundleLoader>
 
     public void ReleaseLoadedAsset(string assetName)
     {
-        if (operationHandles.ContainsKey(assetName))
+        if (operationHandles.TryGetValue(assetName, out var handle))
         {
-            var handle = operationHandles[assetName];
-
             Addressables.Release(handle);
             operationHandles.Remove(assetName);
         }
+    }
+
+    public async UniTask ReleaseLoadedAssetByLabel(string label)
+    {
+        AsyncOperationHandle<IList<IResourceLocation>> locationsHandle = Addressables.LoadResourceLocationsAsync(label);
+
+        IList<IResourceLocation> locations = await locationsHandle.ToUniTask();
+
+        foreach (IResourceLocation location in locations)
+        {
+            string assetName = location.PrimaryKey;
+            ReleaseLoadedAsset(assetName);
+        }
+        Addressables.Release(locationsHandle);
+    }
+
+    public async UniTask ReleaseLoadedAssetByLabel(LoadLabelsData data)
+    {
+        AsyncOperationHandle<IList<IResourceLocation>> locationsHandle = Addressables.LoadResourceLocationsAsync(data.labels, data.mergeMode);
+
+        IList<IResourceLocation> locations = await locationsHandle.ToUniTask();
+
+        foreach (IResourceLocation location in locations)
+        {
+            string assetName = location.PrimaryKey;
+            ReleaseLoadedAsset(assetName);
+        }
+        Addressables.Release(locationsHandle);
     }
 
     public void ReleaseAllAssets()

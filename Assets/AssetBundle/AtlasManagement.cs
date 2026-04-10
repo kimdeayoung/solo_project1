@@ -4,6 +4,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.U2D;
 using System;
+using UnityEngine.UI;
 
 public class AtlasInfo
 {
@@ -24,6 +25,9 @@ public class AtlasInfo
             Sprite sprite = sprites[i];
             string spriteName = sprite.name;
             spriteName = spriteName.Split('(')[0];//just remove spriteName + (Clone)
+#if UNITY_EDITOR
+            Debug.Assert(!_spriteInfo.ContainsKey(spriteName));
+#endif
             _spriteInfo.Add(spriteName, sprite);
         }
     }
@@ -50,31 +54,28 @@ public class AtlasInfo
 
     public void Release()
     {
-        foreach(Sprite sprite in _spriteInfo.Values)
-        {
-            Sprite.Destroy(sprite);
-        }
+        AddressableBundleLoader.Instance.ReleaseLoadedAsset(_atlasName);
         _spriteInfo.Clear();
     }
 }
 
 public class AtlasManagement
 {
-    private List<AtlasInfo> _atalsInfos;
+    private List<AtlasInfo> _atlasInfos;
 
     public AtlasManagement()
     {
-        _atalsInfos = new List<AtlasInfo>();
+        _atlasInfos = new List<AtlasInfo>();
     }
 
-    public void LoadSpriteAtlasAsync(string atlasName, Action onFinished = null)
+    public void LoadSpriteAtlasAsync(string atlasName, Action<string> onFinished = null)
     {
         if (AddressableBundleLoader.Instance.IsCachedAsset(atlasName) == false)
         {
             AddressableBundleLoader.Instance.LoadAssetAsync(atlasName, (SpriteAtlas atlas) =>
             {
-                _atalsInfos.Add(new AtlasInfo(atlasName, atlas));
-                onFinished?.Invoke();
+                _atlasInfos.Add(new AtlasInfo(atlasName, atlas));
+                onFinished?.Invoke(atlasName);
             });
         }
     }
@@ -86,10 +87,10 @@ public class AtlasManagement
         {
             AddressableBundleLoader.Instance.LoadAssetAsync(atlasName, (SpriteAtlas atlas) =>
             {
-                _atalsInfos.Add(new AtlasInfo(atlasName, atlas));
+                _atlasInfos.Add(new AtlasInfo(atlasName, atlas));
                 Debug.Log($"{atlasName} : Load Success!");
             },
-            () =>
+            (string name) =>
             {
                 Debug.LogError($"{atlasName} : Load Failed!");
             });
@@ -103,9 +104,10 @@ public class AtlasManagement
 
     public string GetAtlasName(string spriteName)
     {
-        for (int i = 0; i < _atalsInfos.Count; ++i)
+        int atlasInfoCount = _atlasInfos.Count;
+        for (int i = 0; i < atlasInfoCount; ++i)
         {
-            AtlasInfo atlasInfo = _atalsInfos[i];
+            AtlasInfo atlasInfo = _atlasInfos[i];
             if (atlasInfo.IsExistSpriteName(spriteName))
             {
                 return atlasInfo.AtlasName;
@@ -117,9 +119,10 @@ public class AtlasManagement
 
     public List<string> GetSpriteNamesOrNull(string atlasName)
     {
-        for (int i = 0; i < _atalsInfos.Count; ++i)
+        int atlasInfoCount = _atlasInfos.Count;
+        for (int i = 0; i < atlasInfoCount; ++i)
         {
-            AtlasInfo atlasInfo = _atalsInfos[i];
+            AtlasInfo atlasInfo = _atlasInfos[i];
             if (atlasName == atlasInfo.AtlasName)
             {
                 return atlasInfo.GetSpriteNames();
@@ -131,9 +134,10 @@ public class AtlasManagement
 
     public Sprite GetSpriteOrNull(string spriteName)
     {
-        for (int i = 0; i < _atalsInfos.Count; ++i)
+        int atlasInfoCount = _atlasInfos.Count;
+        for (int i = 0; i < atlasInfoCount; ++i)
         {
-            AtlasInfo atlasInfo = _atalsInfos[i];
+            AtlasInfo atlasInfo = _atlasInfos[i];
             Sprite sprite = atlasInfo.GetSpriteOrNull(spriteName);
             if (sprite != null)
             {
@@ -144,12 +148,56 @@ public class AtlasManagement
         return null;
     }
 
+    public void ReleaseSpecificAtlasInfo(string atlasName)
+    {
+        int atlasInfoCount = _atlasInfos.Count;
+        for (int i = 0; i < atlasInfoCount; ++i)
+        {
+            AtlasInfo atlasInfo = _atlasInfos[i];
+            if (atlasName == atlasInfo.AtlasName)
+            {
+                atlasInfo.Release();
+                _atlasInfos.RemoveAtSwapBack(i);
+                break;
+            }
+        }
+    }
+
     public void ClearData()
     {
-        for (int i = 0; i < _atalsInfos.Count; ++i)
+        for (int i = 0; i < _atlasInfos.Count; ++i)
         {
-            _atalsInfos[i].Release();
+            _atlasInfos[i].Release();
         }
-        _atalsInfos.Clear();
+        _atlasInfos.Clear();
+    }
+}
+
+public static class ImageExtensions
+{
+    public static void SetAtlasSprite(this Image image, string spriteName)
+    {
+        Debug.Assert(!string.IsNullOrEmpty(spriteName), "spriteName is Null or Empty");
+
+        Sprite sprite = AddressableBundleLoader.Instance.AtlasManagement.GetSpriteOrNull(spriteName);
+
+        Debug.Assert(sprite != null, $"Sprite Can't Find Check Atlas Or SpriteName Name : {spriteName}");
+        image.sprite = sprite;
+    }
+}
+
+public static class RawImageExtensions
+{
+    public static void SetRawSpriteAsync(this RawImage image, string rawSpriteName, Action onSuccess, Action<string> onFailed)
+    {
+        Debug.Assert(!string.IsNullOrEmpty(rawSpriteName), "RawSpriteName is Null or Empty");
+        AddressableBundleLoader.Instance.LoadAssetAsync(rawSpriteName, (Texture texture) =>
+        {
+            if (image != null)
+            {
+                image.texture = texture;
+            }
+            onSuccess?.Invoke();
+        }, onFailed);
     }
 }

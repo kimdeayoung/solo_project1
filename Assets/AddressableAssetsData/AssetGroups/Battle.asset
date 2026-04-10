@@ -15,8 +15,26 @@ MonoBehaviour:
   m_GroupName: Battle
   m_GUID: 5bb69209fd99a7343938c7dc31909e29
   m_SerializeEntries:
+  - m_GUID: 2c45031bba144084281fc55c19e66d55
+    m_Address: New Folder
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - IngamePrefab
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 6b8994916d30ac34491a50d2623f4c30
     m_Address: Player
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - IngamePrefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 72af252ef666eae4fbf4461c62da2255
+    m_Address: Player 1
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - IngamePrefab
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d132b88a1cd797e42adbad4fb378f94c
+    m_Address: Player 2
     m_ReadOnly: 0
     m_SerializedLabels:
     - IngamePrefab

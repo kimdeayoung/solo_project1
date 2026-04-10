@@ -24,10 +24,7 @@ public class ActionBtn : MonoBehaviour
 
     public void Init(BtnUIData uiData)
     {
-        Sprite btnImageSprite = AddressableBundleLoader.Instance.GetAtlasSprite(uiData.imageName);
-        Assert.IsNotNull(btnImageSprite);
-        btnImage.sprite = btnImageSprite;
-
+        btnImage.SetAtlasSprite(uiData.imageName);
         onClickBtn = uiData.onClickBtn;
     }
 
