@@ -47,18 +47,19 @@ public class AddressableBundleLoader : Singleton<AddressableBundleLoader>
         else
         {
             AsyncOperationHandle<T> handle = Addressables.LoadAssetAsync<T>(assetName);
+            bool added = operationHandles.TryAdd(assetName, default);
             handle.Completed += (AsyncOperationHandle<T> result) =>
             {
                 switch (result.Status)
                 {
                     case AsyncOperationStatus.Succeeded:
-                        Debug.Assert(!operationHandles.ContainsKey(assetName));
 #if UNITY_EDITOR
-                        bool added = operationHandles.TryAdd(assetName, result);
-                        Debug.Assert(added);
-#else
-                        operationHandles.TryAdd(assetName, result);
+                        Debug.Assert(added, $"Asset Name: {assetName}");
 #endif
+                        if (added)
+                        {
+                            operationHandles[assetName] = result;
+                        }
                         successAction?.Invoke(handle.Result);
                         break;
                     case AsyncOperationStatus.Failed:
@@ -99,16 +100,17 @@ public class AddressableBundleLoader : Singleton<AddressableBundleLoader>
         foreach (IResourceLocation location in locations)
         {
             AsyncOperationHandle<UnityEngine.Object> handle = Addressables.LoadAssetAsync<UnityEngine.Object>(location);
+            string assetName = location.PrimaryKey;
+            bool added = operationHandles.TryAdd(assetName, default);
             handle.Completed += (AsyncOperationHandle<UnityEngine.Object> result) =>
             {
-                string assetName = location.PrimaryKey;
-                Debug.Assert(!operationHandles.ContainsKey(assetName));
 #if UNITY_EDITOR
-                bool added = operationHandles.TryAdd(assetName, result);
-                Debug.Assert(added);
-#else
-                operationHandles.TryAdd(assetName, result);
+                Debug.Assert(added, $"Asset Name: {assetName}");
 #endif
+                if (added)
+                {
+                    operationHandles[assetName] = result;
+                }
                 onAssetLoadEnd?.Invoke(result.Result);
             };
             loadOps.Add(handle);
@@ -130,16 +132,17 @@ public class AddressableBundleLoader : Singleton<AddressableBundleLoader>
         foreach (IResourceLocation location in locations)
         {
             AsyncOperationHandle<UnityEngine.Object> handle = Addressables.LoadAssetAsync<UnityEngine.Object>(location);
+            string assetName = location.PrimaryKey;
+            bool added = operationHandles.TryAdd(assetName, default);
             handle.Completed += (AsyncOperationHandle<UnityEngine.Object> result) =>
             {
-                string assetName = location.PrimaryKey;
-                Debug.Assert(!operationHandles.ContainsKey(assetName));
 #if UNITY_EDITOR
-                bool added = operationHandles.TryAdd(assetName, result);
-                Debug.Assert(added);
-#else
-                operationHandles.TryAdd(assetName, result);
+                Debug.Assert(added, $"Asset Name: {assetName}");
 #endif
+                if (added)
+                {
+                    operationHandles[assetName] = result;
+                }
                 onAssetLoadEnd?.Invoke(result.Result);
             };
             loadOps.Add(handle);
@@ -176,7 +179,7 @@ public class AddressableBundleLoader : Singleton<AddressableBundleLoader>
     /// <param name="parentTrans"></param>
     /// <param name="successAction"></param>
     /// <param name="failedAction"></param>
-    public void InstantiateAsync(string key, Transform parentTrans, Action<GameObject> successAction, Action failedAction = null)
+    public void InstantiateAsync(string key, Transform parentTrans, Action<string, GameObject> successAction, Action failedAction = null)
     {
         if (operationHandles.ContainsKey(key))
         {
@@ -187,9 +190,10 @@ public class AddressableBundleLoader : Singleton<AddressableBundleLoader>
                 switch (completed.Status)
                 {
                     case AsyncOperationStatus.Succeeded:
-                        successAction?.Invoke(completed.Result);
+                        successAction?.Invoke(key, completed.Result);
                         break;
                     default:
+                        Addressables.Release(handle);
                         failedAction?.Invoke();
                         break;
                 }

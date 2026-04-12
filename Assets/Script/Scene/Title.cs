@@ -1,4 +1,6 @@
+using Unity.VectorGraphics;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Title : SceneInstance
 {
@@ -11,6 +13,8 @@ public class Title : SceneInstance
     {
         base.OnStart();
 
+        PlayData.InsertAdvanceData(new CreateInAdvanceData("Player", 1, ObjectType.BattleUnit));
 
+        SceneManager.LoadScene("Battle");
     }
 }

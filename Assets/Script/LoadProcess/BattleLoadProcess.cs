@@ -6,7 +6,7 @@ public class BattleLoadProcess : PreSceneLoadProcess
 {
     public BattleLoadProcess(Action onLoadEndAction) : base(onLoadEndAction)
     {
-        singleAssetNames = new List<string>();
-        singleAssetNames.Add("Player");
+        labelNames = new List<string>();
+        labelNames.Add("IngamePrefab");
     }
 }

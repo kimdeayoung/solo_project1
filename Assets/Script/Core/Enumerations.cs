@@ -10,8 +10,10 @@ public enum TableLoadType
     Binary,
 }
 
-public enum PreCreationObjectType
+public enum ObjectType
 {
+    BattleUnit,
+    Projectile,
     Length,
 }
 
@@ -23,16 +25,12 @@ public enum BattleStateType
     Defeat,
 }
 
-public enum UnitType
-{
-    Character,
-
-}
-
 public enum UnitState
 {
     Idle,
     Stun,
+    Chase,
+    Action,
 }
 
 public enum StageDifficultyType
@@ -40,10 +38,17 @@ public enum StageDifficultyType
     Normal,
 }
 
-public enum LoadState
+public enum PreLoadCondition
 {
-    NotComplete,
-    Complete,
+    LoadAsset,
+    Entitiy,
+    Length,
+}
+
+public enum PreLoadState
+{
+    NotReady,
+    Ready,
 }
 
 public enum SkillType

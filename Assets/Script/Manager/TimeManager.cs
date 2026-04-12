@@ -17,6 +17,11 @@ public class TimeManager : UpdateableManager<TimeManager>
     {
     }
 
+    public void SetGameSpeed(float speed)
+    {
+        GameSpeed = speed;
+    }
+
     public override void ClearData()
     {
         GameSpeed = 1.0f;

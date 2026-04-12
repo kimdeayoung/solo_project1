@@ -170,5 +170,12 @@ public static class ActionDataPool
         list.Add(actionData);
     }
 
-    //TODO: Pool Release 기능 필요
+    public static void Clear()
+    {
+        int loopCount = (int)ActionDataType.Length;
+        for (int i = 0; i < loopCount; i++)
+        {
+            _actionDatas[i].Clear();
+        }
+    }
 }
