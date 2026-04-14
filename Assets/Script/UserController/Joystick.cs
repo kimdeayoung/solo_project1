@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -8,47 +9,49 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
 
     private Vector3 leverInitialPos;
     private float areaRadius;
+    private float sqrAreaRadius;
 
     private Vector2 leverPos;
+    private float moveIntensity;
 
-    private bool isTouchJoyStick;
+    public event Action<Vector2, float> OnUpdateDirection;
 
-    public Vector2 LeverPos { get => leverPos; }
-    public bool IsTouchJoyStick { get => isTouchJoyStick; }
-
-    private void Awake()
+    private void Start()
     {
         Debug.Assert(leverArea != null);
         Debug.Assert(lever != null);
 
         leverInitialPos = lever.transform.localPosition;
         areaRadius = leverArea.rect.width * 0.5f;
+
+        sqrAreaRadius = areaRadius * areaRadius;
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        isTouchJoyStick = true;
-
         ComputeLeverTransform(eventData);
+        OnUpdateDirection?.Invoke(leverPos.normalized, moveIntensity);
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        isTouchJoyStick = false;
-
         lever.transform.localPosition = leverInitialPos;
-        leverPos = Vector2.zero;
+
+        OnUpdateDirection?.Invoke(Vector3.zero, 0f);
     }
 
     public void OnDrag(PointerEventData eventData)
     {
         ComputeLeverTransform(eventData);
+        OnUpdateDirection?.Invoke(leverPos.normalized, moveIntensity);
     }
 
     private void ComputeLeverTransform(PointerEventData eventData)
     {
-        leverPos = eventData.position - (Vector2)leverArea.position;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(leverArea, eventData.position, eventData.pressEventCamera, out leverPos);
         leverPos = Vector2.ClampMagnitude(leverPos, areaRadius);// 조이스틱 이동범위를 넘지않도록 조정
         lever.localPosition = leverPos;
+
+        moveIntensity = leverPos.sqrMagnitude / sqrAreaRadius;
     }
 }

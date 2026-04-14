@@ -4,11 +4,13 @@ using UnityEngine;
 
 public class UIController : MonoBehaviour
 {
+    [SerializeField] private Camera cam;
+    public Camera Camera => cam;
     [SerializeField] private Transform uiRoot;
 
-    private Dictionary<Type, List<UIBase>> _cachedUis = new Dictionary<Type, List<UIBase>>(8);
-    private PriorityQueue<UIBase> _showDelayUis = new PriorityQueue<UIBase>(new UIBaseComparer());
-    private List<UIBase> _instantUis = new List<UIBase>(16);
+    private Dictionary<Type, List<UIBase>> cachedUis = new Dictionary<Type, List<UIBase>>(8);
+    private PriorityQueue<UIBase> showDelayUis = new PriorityQueue<UIBase>(new UIBaseComparer());
+    private List<UIBase> instantUis = new List<UIBase>(16);
 
     private UIBase sequenceDisplayUI;
 
@@ -28,7 +30,7 @@ public class UIController : MonoBehaviour
         uiBase.ResetVariables(priority, sequenceID++);
         uiBase.InvisibleUI();
 
-        _showDelayUis.Enqueue(uiBase);
+        showDelayUis.Enqueue(uiBase);
 
         enabled = true;
 
@@ -43,7 +45,7 @@ public class UIController : MonoBehaviour
         uiBase.ResetVariables(priority, sequenceID++);
         uiBase.VisibleUI();
 
-        _instantUis.Add(uiBase);
+        instantUis.Add(uiBase);
 
         return uiBase;
     }
@@ -52,7 +54,7 @@ public class UIController : MonoBehaviour
     {
         if (sequenceDisplayUI.Equals(uiBase))
         {
-            if (_showDelayUis.Count > 0)
+            if (showDelayUis.Count > 0)
             {
                 enabled = true;
             }
@@ -63,26 +65,26 @@ public class UIController : MonoBehaviour
         }
         else
         {
-            int instantUiCount = _instantUis.Count;
+            int instantUiCount = instantUis.Count;
             for (int i = 0; i < instantUiCount; i++)
             {
-                if (_instantUis[i].Equals(uiBase))
+                if (instantUis[i].Equals(uiBase))
                 {
-                    _instantUis.RemoveAt(i);
+                    instantUis.RemoveAt(i);
                     break;
                 }
             }
         }
 
         uiBase.InvisibleUI();
-        _cachedUis.TryGetValue(uiBase.Type, out List<UIBase> uiBases);
+        cachedUis.TryGetValue(uiBase.Type, out List<UIBase> uiBases);
         uiBases.Add(uiBase);
     }
 
     private UIBase GetUIBase(Type type)
     {
         UIBase uiBase = null;
-        if (_cachedUis.TryGetValue(type, out List<UIBase> uiBases))
+        if (cachedUis.TryGetValue(type, out List<UIBase> uiBases))
         {
             if (uiBases.Count > 0)
             {
@@ -98,7 +100,7 @@ public class UIController : MonoBehaviour
         }
         else
         {
-            _cachedUis.Add(type, new List<UIBase>(4));
+            cachedUis.Add(type, new List<UIBase>(4));
 
             GameObject instance = AddressableBundleLoader.Instance.Instantiate(type.Name, uiRoot);
             uiBase = instance.GetComponent<UIBase>();
@@ -112,9 +114,9 @@ public class UIController : MonoBehaviour
     {
         Debug.Assert(sequenceDisplayUI == null);
 
-        if (_showDelayUis.Count > 0)
+        if (showDelayUis.Count > 0)
         {
-            _showDelayUis.TryDequeue(out UIBase uiBase);
+            showDelayUis.TryDequeue(out UIBase uiBase);
 
             sequenceDisplayUI = uiBase;
             uiBase.VisibleUI();
@@ -125,7 +127,7 @@ public class UIController : MonoBehaviour
 
     private void Update()
     {
-        if (sequenceDisplayUI == null && _showDelayUis.Count > 0)
+        if (sequenceDisplayUI == null && showDelayUis.Count > 0)
         {
             ActiveShowDelayedUI();
         }
@@ -139,12 +141,12 @@ public class UIController : MonoBehaviour
     public UIBase FindFirstInstantUIOrNull<T>() where T : UIBase
     {
         Type type = typeof(T);
-        int instantUiCount = _instantUis.Count;
+        int instantUiCount = instantUis.Count;
         for (int i = 0; i < instantUiCount; i++)
         {
-            if (_instantUis[i].Type == type)
+            if (instantUis[i].Type == type)
             {
-                return _instantUis[i];
+                return instantUis[i];
             }
         }
         return null;
@@ -154,7 +156,7 @@ public class UIController : MonoBehaviour
     {
 
 
-        foreach (List<UIBase> uiBases in _cachedUis.Values)
+        foreach (List<UIBase> uiBases in cachedUis.Values)
         {
             int loopCount = uiBases.Count;
             for (int i = 0; i < loopCount; i++)
@@ -163,6 +165,6 @@ public class UIController : MonoBehaviour
             }
         }
 
-        _cachedUis.Clear();
+        cachedUis.Clear();
     }
 }

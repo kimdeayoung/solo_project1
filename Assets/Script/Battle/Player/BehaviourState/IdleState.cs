@@ -5,7 +5,6 @@ namespace PlayerState
     public class IdleState : BehaviourState
     {
         private Player player;
-        private UserControllerData userControllerData;
 
         public override UnitState UnitState => UnitState.Idle;
 
@@ -15,12 +14,10 @@ namespace PlayerState
 
             player = owner as Player;
             Debug.Assert(player != null);
-            userControllerData = player.UserControllerData;
         }
 
         public override void OnStart()
         {
-
         }
 
         public override void OnUpdate(float deltaTime)
@@ -40,12 +37,7 @@ namespace PlayerState
 
         private void UpdateMove(float fixedDeltaTime)
         {
-            Joystick joystick = userControllerData.JoyStick;
-            if (joystick.IsTouchJoyStick)
-            {
-                Vector2 joystickDir = joystick.LeverPos.normalized;
-                player.TranslateWithRotation(new Vector3(joystickDir.x, 0f, joystickDir.y), fixedDeltaTime);
-            }
+            player.TranslateWithRotation(fixedDeltaTime);
         }
     }
 }

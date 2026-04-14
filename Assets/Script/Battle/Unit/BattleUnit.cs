@@ -50,6 +50,10 @@ public abstract class BattleUnit : MonoBehaviour
         ActionResource -= data.actionResource;
     }
 
+    public virtual void SetMoveDirection(Vector3 direction, float intensity)
+    {
+    }
+
     public virtual void UpdateActionDatas(float deltaTime)
     {
     }

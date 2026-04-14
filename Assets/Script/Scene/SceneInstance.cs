@@ -3,6 +3,7 @@ using UnityEngine;
 public abstract class SceneInstance : MonoBehaviour
 {
     public Camera MainCam { get; private set; }
+    public Camera UICam { get; private set; }
 
     public UIController UIController { get; private set; }
     public SafeAreaController SafeAreaController { get; private set; }
@@ -18,6 +19,7 @@ public abstract class SceneInstance : MonoBehaviour
 
         UIController = GameObject.Find("UI").GetComponent<UIController>();
         UIController.Init();
+        UICam = UIController.Camera;
 
         SafeAreaController = new SafeAreaController();
     }

@@ -8,9 +8,6 @@ public class BattleUIController
 {
     private HUD uiBattle;
 
-    public Joystick Joystick { get => uiBattle.JoyStick; }
-    public ActionBtn[] ActionBtns { get => uiBattle.ActionBtns; }
-
     public BattleUIController()
     {
     }

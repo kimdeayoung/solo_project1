@@ -46,6 +46,9 @@ public class Entitys
 
         await UniTask.WaitUntil(() => IsEmptyInstantiate);
 
+        activeBattleUnits.Add(player);
+        player.OnStart();
+
         battleScene.SetPreLoadState(PreLoadCondition.Entitiy);
     }
 

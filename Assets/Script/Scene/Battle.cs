@@ -33,19 +33,19 @@ public class Battle : SceneInstance
     {
         TimeManager.Instance.SetGameSpeed(1.0f);
 
-        {
-            UIController.ShowInstant<HUD>();
-        }
+        HUD hud = UIController.ShowInstant<HUD>();
+        hud.Init();
 
         {
-            BattleUnit player = Entity.FindBattleUnitOrNull(BattleUnitType.Player);
+            Player player = Entity.FindBattleUnitOrNull(BattleUnitType.Player) as Player;
             Debug.Assert(player != null);
+
+            hud.RegisterPlayer(player);
 
             GlobalVariables globalVariables = GameManager.Instance.GlobalVariables;
 
             ObjectFollower objectFollower = MainCam.transform.AddComponent<ObjectFollower>();
-            objectFollower.ResetVariables(player.gameObject, globalVariables.FollowCamOffset, globalVariables.FollowCamLookAtTarget);
-            //objectFollower.SetTarget(player.gameObject);
+            objectFollower.ResetVariables(player.gameObject, globalVariables.FollowCamOffset, globalVariables.FollowCamRotation);
         }
     }
 

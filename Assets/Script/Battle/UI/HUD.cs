@@ -10,6 +10,22 @@ public class HUD : UIBase
     [SerializeField]
     private ActionBtn[] actionBtns;
 
-    public Joystick JoyStick { get => joyStick; }
-    public ActionBtn[] ActionBtns { get => actionBtns; }
+    private Player player;
+
+    public void Init()
+    {
+        joyStick.OnUpdateDirection += UpdatePlayerMoveDirection;
+    }
+
+    public void RegisterPlayer(Player player)
+    {
+        this.player = player;
+
+        //IReadOnlyList<BaseActionData> baseActions = player.ActionDatas;
+    }
+
+    private void UpdatePlayerMoveDirection(Vector2 direction, float moveIntensity)
+    {
+        player.SetMoveDirection(new Vector3(direction.x, 0f, direction.y), moveIntensity);
+    }
 }

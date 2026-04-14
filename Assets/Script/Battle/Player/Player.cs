@@ -7,29 +7,28 @@ public class Player : BattleUnit
 {
     [SerializeField] private PlayerStatusStat _stat;
 
-    public UserControllerData UserControllerData { get; private set; }
-
     public override BattleUnitType Type =>  BattleUnitType.Player;
 
+    private Vector3 moveDirection;
+    private float moveIntensity;
+
     private List<BaseActionData> _actionDatas;
+    public IReadOnlyList<BaseActionData> ActionDatas => _actionDatas;
 
     public override void Init(string assetName)
     {
         base.Init(assetName);
 
-        //UserControllerData = new UserControllerData(battleUIController.Joystick, battleUIController.ActionBtns);
-
         BehaviourController.AddBehaviourState<IdleState>(this)
                            .AddBehaviourState<StunState>(this);
-        
+        BehaviourController.SetBehaviourState(UnitState.Idle);
+
         Status = new PlayerStatus(this, _stat);
     }
 
     public override void OnStart()
     {
         base.OnStart();
-
-        BehaviourController.SetBehaviourState(UnitState.Idle);
 
         {
             BaseActionDataSO[] actionDatas = _stat.ActionDatas;
@@ -66,9 +65,21 @@ public class Player : BattleUnit
         }
     }
 
-    public void TranslateWithRotation(Vector3 targetDir, float fixedDeltaTime)
+    public override void SetMoveDirection(Vector3 direction, float intensity)
     {
-        Quaternion targetRotation = Quaternion.LookRotation(targetDir, Vector3.up);
+        base.SetMoveDirection(direction, intensity);
+        moveDirection = direction;
+        moveIntensity = intensity;
+    }
+
+    public void TranslateWithRotation(float fixedDeltaTime)
+    {
+        if (moveIntensity <= float.Epsilon)
+        {
+            return;
+        }
+
+        Quaternion targetRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
         Quaternion newRotation = Quaternion.RotateTowards(rigidBody.rotation, targetRotation, _stat.Rotate * fixedDeltaTime);
 
         rigidBody.MoveRotation(newRotation);
@@ -77,7 +88,7 @@ public class Player : BattleUnit
         forward.y = 0f;
         forward.Normalize();
 
-        Vector3 move = forward * _stat.MoveSpeed * fixedDeltaTime;
+        Vector3 move = forward * _stat.MoveSpeed * moveIntensity * fixedDeltaTime;
         rigidBody.MovePosition(rigidBody.position + move);
     }
 }

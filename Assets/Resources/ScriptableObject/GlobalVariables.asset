@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a672f82ee926a034cb5f1f8d5eefc4a4, type: 3}
   m_Name: GlobalVariables
   m_EditorClassIdentifier: Assembly-CSharp::GlobalVariables
-  followCamOffset: {x: 0, y: 2, z: -1.5}
-  followCamLookAtTarget: 1
+  followCamOffset: {x: 5.11, y: 5.11, z: -4.04}
+  followCamRotation: {x: 35.6, y: -51.67, z: 0}
+  followCamLookAtTarget: 0
