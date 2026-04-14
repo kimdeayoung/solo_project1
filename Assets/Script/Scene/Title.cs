@@ -1,11 +1,11 @@
-using Unity.VectorGraphics;
-using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class Title : SceneInstance
 {
     public override void PreLoad()
     {
+        base.PreLoad();
+
         OnStart();
     }
 

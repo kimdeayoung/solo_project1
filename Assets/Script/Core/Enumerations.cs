@@ -78,3 +78,12 @@ public enum AddStatusInfluenceType
     Independent,
     Stack,
 }
+
+public enum AppearPriority
+{
+    VeryHigh,
+    High,
+    Normal,
+    Low,
+    VeryLow,
+}

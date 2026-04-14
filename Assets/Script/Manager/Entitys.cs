@@ -8,7 +8,8 @@ public class Entitys
     private AddressableBundleLoader loader;
     private List<BattleUnit> activeBattleUnits;
 
-    private Dictionary<string, List<BattleUnit>> _units;
+    private BattleUnit player;
+    private Dictionary<string, List<BattleUnit>> units;
 
     private int _requestInstantiateCount;
     public bool IsEmptyInstantiate => _requestInstantiateCount == 0;
@@ -20,7 +21,7 @@ public class Entitys
         ActionDataPool.Init();
 
         activeBattleUnits = new List<BattleUnit>(512);
-        _units = new Dictionary<string, List<BattleUnit>>(8);
+        units = new Dictionary<string, List<BattleUnit>>(8);
 
         battleScene = GameManager.Instance.SceneInstance<Battle>();
         Debug.Assert(battleScene != null);
@@ -57,12 +58,13 @@ public class Entitys
     /// <returns></returns>
     public T CreateBattleUnit<T>(string assetName) where T : BattleUnit
     {
-        _units.TryGetValue(assetName, out List<BattleUnit> units);
+        this.units.TryGetValue(assetName, out List<BattleUnit> units);
         Debug.Assert(units.Count > 0);
 
         BattleUnit unit = units[^1];
         Debug.Assert(unit != null);
         units.RemoveAt(units.Count - 1);
+        unit.gameObject.SetActive(true);
 
         activeBattleUnits.Add(unit);
         unit.OnStart();
@@ -85,23 +87,23 @@ public class Entitys
         BattleUnit unit = obj.GetComponent<BattleUnit>();
         unit.Init(key);
 
-        if (!_units.TryGetValue(key, out List<BattleUnit> units))
+        List<BattleUnit> units = null;
+        switch (unit.Type)
         {
-            int capacity = 0;
-            switch (unit.Type)
-            {
-                case BattleUnitType.Player:
-                    capacity = 2;
-                    break;
-                case BattleUnitType.Enemy:
-                    capacity = 256;
-                    break;
-            }
-            units = new List<BattleUnit>(capacity);
-            _units.Add(key, units);
+            case BattleUnitType.Player:
+                player = unit;
+                break;
+            case BattleUnitType.Enemy:
+                if (!this.units.TryGetValue(key, out units))
+                {
+                    int capacity = 256;
+                    units = new List<BattleUnit>(capacity);
+                    this.units.Add(key, units);
+                }
+                unit.gameObject.SetActive(false);
+                units.Add(unit);
+                break;
         }
-        units.Add(unit);
-
         --_requestInstantiateCount;
     }
 
@@ -121,6 +123,30 @@ public class Entitys
         {
             activeBattleUnits[i].OnFixedUpdate(fixedDeltaTime);
         }
+    }
+
+    public BattleUnit FindBattleUnitOrNull(BattleUnitType type)
+    {
+        switch (type)
+        {
+            case BattleUnitType.Player:
+                return player;
+
+            case BattleUnitType.Length:
+                return null;
+        }
+
+        int loopCount = activeBattleUnits.Count;
+        for (int i = 0; i < loopCount; i++)
+        {
+            BattleUnit unit = activeBattleUnits[i];
+            if (unit.Type == type)
+            {
+                return unit;
+            }
+        }
+
+        return null;
     }
 }
 

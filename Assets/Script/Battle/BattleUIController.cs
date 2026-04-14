@@ -6,7 +6,7 @@ using UnityEngine.Assertions;
 
 public class BattleUIController
 {
-    private BattleUI uiBattle;
+    private HUD uiBattle;
 
     public Joystick Joystick { get => uiBattle.JoyStick; }
     public ActionBtn[] ActionBtns { get => uiBattle.ActionBtns; }

@@ -8,9 +8,12 @@ public class GameManager : ManagerWithMono<GameManager>
     private List<IManager> managers;
     private List<IUpdateableManager> updateableManagers;
 
+    public GlobalVariables GlobalVariables { get; private set; }
+
     private SceneInstance sceneInstance;
     private Dictionary<string, System.Type> sceneTypes = new Dictionary<string, System.Type>(8);
 
+    public SceneInstance SceneInstance() => sceneInstance;
     public T SceneInstance<T>() where T : SceneInstance => sceneInstance as T;
 
     public void Awake()
@@ -18,7 +21,7 @@ public class GameManager : ManagerWithMono<GameManager>
         managers = new List<IManager>(8);
         updateableManagers = new List<IUpdateableManager>(8);
 
-        Tables.Instance.LoadTables_Binary();
+        GlobalVariables = Resources.Load<GlobalVariables>("ScriptableObject/GlobalVariables");
 
         AddressableBundleLoader.Instance.InitInstance();
         DontDestroyOnLoad(this);

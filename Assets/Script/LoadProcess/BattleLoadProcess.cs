@@ -8,5 +8,6 @@ public class BattleLoadProcess : PreSceneLoadProcess
     {
         labelNames = new List<string>();
         labelNames.Add("IngamePrefab");
+        labelNames.Add("IngameUI");
     }
 }

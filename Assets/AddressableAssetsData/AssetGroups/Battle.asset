@@ -28,7 +28,7 @@ MonoBehaviour:
     - IngamePrefab
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: f1f199a5155ddde49a6bf9d21abb0a62
-    m_Address: BattleUI
+    m_Address: HUD
     m_ReadOnly: 0
     m_SerializedLabels:
     - IngameUI

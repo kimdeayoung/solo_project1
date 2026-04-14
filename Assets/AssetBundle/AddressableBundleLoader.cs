@@ -172,6 +172,24 @@ public class AddressableBundleLoader : Singleton<AddressableBundleLoader>
     }
 
     /// <summary>
+    /// 에셋 로드 밑 캐싱이 완료된 경우에만 동기 생성
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="key"></param>
+    /// <param name="parentTrans"></param>
+    public GameObject Instantiate(string key, Transform parentTrans)
+    {
+        if (operationHandles.ContainsKey(key))
+        {
+            var handle = Addressables.InstantiateAsync(key, parentTrans);
+            GameObject result = handle.WaitForCompletion();
+
+            return result;
+        }
+        return null;
+    }
+
+    /// <summary>
     /// 에셋 로드 밑 캐싱이 완료된 경우에만 비동기 생성
     /// </summary>
     /// <typeparam name="T"></typeparam>

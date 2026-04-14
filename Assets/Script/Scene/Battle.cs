@@ -1,5 +1,5 @@
 using Cysharp.Threading.Tasks;
-using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Battle : SceneInstance
@@ -11,6 +11,8 @@ public class Battle : SceneInstance
 
     public override void PreLoad()
     {
+        base.PreLoad();
+
         TimeManager.Instance.SetGameSpeed(0.0f);
 
         EntityRoot = transform.Find("BattleObjects");
@@ -30,17 +32,34 @@ public class Battle : SceneInstance
     protected override void OnStart()
     {
         TimeManager.Instance.SetGameSpeed(1.0f);
+
+        {
+            UIController.ShowInstant<HUD>();
+        }
+
+        {
+            BattleUnit player = Entity.FindBattleUnitOrNull(BattleUnitType.Player);
+            Debug.Assert(player != null);
+
+            GlobalVariables globalVariables = GameManager.Instance.GlobalVariables;
+
+            ObjectFollower objectFollower = MainCam.transform.AddComponent<ObjectFollower>();
+            objectFollower.ResetVariables(player.gameObject, globalVariables.FollowCamOffset, globalVariables.FollowCamLookAtTarget);
+            //objectFollower.SetTarget(player.gameObject);
+        }
     }
 
-    private void Update()
+    protected override void Update()
     {
+        base.Update();
         float deltaTime = Time.deltaTime * TimeManager.Instance.GameSpeed;
 
         Entity.OnUpdate(deltaTime);
     }
 
-    private void FixedUpdate()
+    protected override void FixedUpdate()
     {
+        base.FixedUpdate();
         float fixedDeltaTime = Time.fixedDeltaTime;
 
         Entity.OnFixedUpdate(fixedDeltaTime);

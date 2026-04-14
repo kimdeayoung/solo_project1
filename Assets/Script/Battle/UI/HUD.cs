@@ -2,11 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BattleUI : MonoBehaviour
+public class HUD : UIBase
 {
-    [SerializeField]
-    private Canvas canvas;
-
     [SerializeField]
     private Joystick joyStick;
 
@@ -15,9 +12,4 @@ public class BattleUI : MonoBehaviour
 
     public Joystick JoyStick { get => joyStick; }
     public ActionBtn[] ActionBtns { get => actionBtns; }
-
-    private void Awake()
-    {
-        
-    }
 }
