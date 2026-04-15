@@ -36,11 +36,7 @@ public class Player : BattleUnit
             _actionDatas = new List<BaseActionData>(actionDataCount);
             for (int i = 0; i < actionDataCount; i++)
             {
-                BaseActionDataSO actionDataSO = actionDatas[i];
-                BaseActionData actionData = ActionDataPool.GetActionParameter(actionDataSO.ActionType);
-
-                actionData.Init(this);
-                actionData.ResetVariables(actionDataSO);
+                BaseActionData actionData = ActionDataPool.GetActionData(this, actionDatas[i]);
                 _actionDatas.Add(actionData);
             }
         }
@@ -61,7 +57,7 @@ public class Player : BattleUnit
         int loopCount = _actionDatas.Count;
         for (int i = 0; i < loopCount; i++)
         {
-            _actionDatas[i].OnUpdate(deltaTime, Status.Haste);
+            _actionDatas[i].OnUpdate(deltaTime, Status.GetHaste());
         }
     }
 

@@ -1,12 +1,24 @@
 using UnityEngine;
 
-public readonly struct AddStatusInfluenceData
+public struct AddStatusInfluenceData
 {
-    public readonly AddStatusInfluenceType addStatusInfluenceType;
+    public AddStatusInfluenceType addStatusInfluenceType;
 
-    public readonly StatusInfluenceType statusInfluenceType;
+    public StatusInfluenceType statusInfluenceType;
 
-    public readonly float duration;
+    public float duration;
 
-    public readonly float value;
+    public float value;
+
+    public AddStatusInfluenceData(AddStatusInfluenceType addStatusInfluenceType, StatusInfluenceType statusInfluenceType, float duration, float value)
+    {
+        this.addStatusInfluenceType = addStatusInfluenceType;
+        this.statusInfluenceType = statusInfluenceType;
+        this.duration = duration;
+        this.value = value;
+    }
+
+    public AddStatusInfluenceData(ApplyStatusInfluenceParameterSO parameter) : this(parameter.AddStatusInfluenceType, parameter.StatusInfluenceType, parameter.StatusInfluenceDuration, parameter.Value)
+    {
+    }
 }

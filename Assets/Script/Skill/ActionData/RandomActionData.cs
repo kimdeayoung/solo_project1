@@ -9,18 +9,18 @@ public class RandomActionData : BaseActionData
 
     public override ActionDataType ActionDataType => ActionDataType.Random;
 
-    public override void ResetVariables(BaseActionDataSO data)
+    public override void ResetVariables(BattleUnit owner, BaseActionDataSO data)
     {
-        base.ResetVariables(data);
+        base.ResetVariables(owner, data);
 
         RandomActionDataSO randomAction = data as RandomActionDataSO;
         Debug.Assert(randomAction != null);
 
-        ActionParameter[] actionParameters = randomAction.ActionParameters;
+        ActionParameterSO[] actionParameters = randomAction.ActionParameters;
         int actionParameterCount = actionParameters.Length;
         for (int i = 0; i < actionParameterCount; i++)
         {
-            _actionParameters.Add(actionParameters[i]);
+            _actionParameters.Add(ActionParameterPool.GetActionParameter(actionParameters[i]));
         }
 
         int[] actionWeights = randomAction.ActionWeights;

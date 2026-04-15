@@ -69,7 +69,8 @@ public enum EventType
 public enum StatusInfluenceType
 {
     Stun,
-    Slow,
+    MoveSpeedUp,
+    MoveSpeedDown,
     Length,
 }
 

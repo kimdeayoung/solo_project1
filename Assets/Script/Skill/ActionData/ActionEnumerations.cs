@@ -16,6 +16,6 @@ public enum ActionDataType
 public enum ActionParameterType
 {
     Projectile,
-    ApplyStatus,
+    ApplyStatusInfluence,
     Length,
 }

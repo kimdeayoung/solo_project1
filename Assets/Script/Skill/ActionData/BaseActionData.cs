@@ -33,13 +33,9 @@ public abstract class BaseActionData
 
     protected CancellationTokenSource cancelToken;
 
-    public void Init(BattleUnit owner)
+    public virtual void ResetVariables(BattleUnit owner, BaseActionDataSO data)
     {
         this.owner = owner;
-    }
-
-    public virtual void ResetVariables(BaseActionDataSO data)
-    {
         _resourceData = new ActionResourceData(data);
 
         _coolTime = _resourceData.coolTime;
@@ -117,22 +113,22 @@ public abstract class BaseActionData
 
 public static class ActionDataPool
 {
-    private static List<BaseActionData>[] _actionDatas;
+    private static List<BaseActionData>[] actionDatas;
 
     public static void Init()
     {
         int loopCount = (int)ActionDataType.Length;
-        _actionDatas = new List<BaseActionData>[loopCount];
+        actionDatas = new List<BaseActionData>[loopCount];
 
         for (int i = 0; i < loopCount; i++)
         {
-            _actionDatas[i] = new List<BaseActionData>(32);
+            actionDatas[i] = new List<BaseActionData>(32);
         }
     }
 
-    public static BaseActionData GetActionParameter(ActionDataType type)
+    public static BaseActionData GetActionData(BattleUnit owner, BaseActionDataSO data)
     {
-        List<BaseActionData> list = _actionDatas[(int)type];
+        List<BaseActionData> list = actionDatas[(int)data.ActionType];
 
         BaseActionData actionData = null;
         if (list.Count > 0)
@@ -143,8 +139,9 @@ public static class ActionDataPool
         }
         else
         {
-            actionData = CreateActionData(type);
+            actionData = CreateActionData(data.ActionType);
         }
+        actionData.ResetVariables(owner, data);
         Debug.Assert(actionData != null);
         return actionData;
     }
@@ -166,7 +163,7 @@ public static class ActionDataPool
     public static void Release(BaseActionData actionData)
     {
         ActionDataType type = actionData.ActionDataType;
-        List<BaseActionData> list = _actionDatas[(int)type];
+        List<BaseActionData> list = actionDatas[(int)type];
         list.Add(actionData);
     }
 
@@ -175,7 +172,7 @@ public static class ActionDataPool
         int loopCount = (int)ActionDataType.Length;
         for (int i = 0; i < loopCount; i++)
         {
-            _actionDatas[i].Clear();
+            actionDatas[i].Clear();
         }
     }
 }

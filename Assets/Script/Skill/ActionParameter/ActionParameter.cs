@@ -1,34 +1,30 @@
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using System.Threading;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public abstract class ActionParameter
 {
     public abstract ActionParameterType ActionParameterType { get; }
 
-    private float _runDelay;
-    public float RunDelay => _runDelay;
-
-    private float _duration;
-    public float Duration => _duration;
-
-    private string _animationName;
-    public string AnimationName => _animationName;
+    public int ParameterUniqueID { get; private set; }
+    public float RunDelay { get; private set; }
+    public float Duration { get; private set; }
+    public string AnimationName { get; private set; }
 
     public virtual void ResetVariables(ActionParameterSO data)
     {
-        _runDelay = data.RunDelay;
+        ParameterUniqueID = data.ParameterUniqueID;
+        RunDelay = data.RunDelay;
 
-        _duration = data.Duration;
+        Duration = data.ActionDuration;
 
-        _animationName = data.AnimationName;
+        AnimationName = data.AnimationName;
     }
 
     public async void RunAction(BattleUnit target, CancellationToken token)
     {
-        bool isCanceled = await UniTask.WaitForSeconds(_runDelay, cancellationToken: token).SuppressCancellationThrow();
+        bool isCanceled = await UniTask.WaitForSeconds(RunDelay, cancellationToken: token).SuppressCancellationThrow();
 
         if (!isCanceled)
         {
@@ -59,9 +55,9 @@ public static class ActionParameterPool
         }
     }
 
-    public static ActionParameter GetActionParameter(ActionParameterType type)
+    public static ActionParameter GetActionParameter(ActionParameterSO data)
     {
-        List<ActionParameter> list = _actionParameters[(int)type];
+        List<ActionParameter> list = _actionParameters[(int)data.ActionParameterType];
 
         ActionParameter actionParameter = null;
         if (list.Count > 0)
@@ -72,8 +68,9 @@ public static class ActionParameterPool
         }
         else
         {
-            actionParameter = CreateActionParameter(type);
+            actionParameter = CreateActionParameter(data.ActionParameterType);
         }
+        actionParameter.ResetVariables(data);
         Debug.Assert(actionParameter != null);
         return actionParameter;
     }
@@ -83,8 +80,10 @@ public static class ActionParameterPool
         switch (type)
         {
             case ActionParameterType.Projectile:
+                return new ProjectileParameter();
 
-                break;
+            case ActionParameterType.ApplyStatusInfluence:
+                return new ApplyStatusInfluenceParameter();
         }
 
         return null;

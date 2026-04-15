@@ -6,37 +6,17 @@ using UnityEngine.Assertions;
 public abstract class UnitStatus
 {
     protected BattleUnit owner;
-
-    protected int hp;
-    protected int maxHp;
-
-    protected float atk;
-    protected float def;
+    private StatusAttributes statusAttributes;
 
     protected StatusInfluenceInfo influenceInfo;
-
-    protected int stunCount;
-
-    public float MoveSpeed { get; protected set; }
-    public float Haste { get; protected set; }
 
     public UnitStatus(BattleUnit owner, UnitStat stat)
     {
         this.owner = owner;
         influenceInfo = new StatusInfluenceInfo(owner);
 
-        ApplyStat(stat);
-    }
-
-    protected virtual void ApplyStat(UnitStat stat)
-    {
-        maxHp = hp = stat.Hp;
-        atk = stat.Atk;
-        def = stat.Def;
-
-        MoveSpeed = stat.MoveSpeed;
-        Haste = 0;
-        stunCount = 0;
+        statusAttributes = new StatusAttributes();
+        statusAttributes.ApplyStat(stat);
     }
 
     public void OnUpdate(float deltaTime)
@@ -47,27 +27,48 @@ public abstract class UnitStatus
 
     public bool IsAlive()
     {
-        return hp > 0;
+        return statusAttributes.IsAlive();
     }
 
-    public virtual UnitState GetUnitState()
+    public void ApplyStatusInfluence(AddStatusInfluenceData data)
     {
-        return UnitState.Idle;
+        if (!IsAlive())
+        {
+            return;
+        }
+
+        Debug.Assert(influenceInfo != null);
+        influenceInfo.ApplyStatusInfluence(data);
+    }
+
+    public void ChangeMoveSpeed(float value)
+    {
+        statusAttributes.ChangeMoveSpeed(value);
+    }
+
+    public float GetHaste()
+    {
+        return statusAttributes.Haste;
     }
 
     public void IncreaseStunCount()
     {
-        if (stunCount++ == 0)
+        if (statusAttributes.StunCount == 0)
         {
             owner.BehaviourController.SetBehaviourState(UnitState.Stun);
         }
+        statusAttributes.IncreaseStunCount();
     }
 
     public void DecreaseStunCount()
     {
-        if (--stunCount == 0)
+        statusAttributes.DecreaseStunCount();
+        if (statusAttributes.StunCount == 0)
         {
-            owner.BehaviourController.SetBehaviourState(UnitState.Idle);
+            if (IsAlive())
+            {
+                owner.BehaviourController.SetBehaviourState(UnitState.Idle);
+            }
         }
     }
 }

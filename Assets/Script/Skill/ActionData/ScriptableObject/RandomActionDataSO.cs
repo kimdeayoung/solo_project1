@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "RandomActionDataSO", menuName = "Scriptable Objects/RandomActionDataSO")]
+[CreateAssetMenu(fileName = "RandomActionDataSO", menuName = "Scriptable Objects/ActionData/RandomActionDataSO")]
 public class RandomActionDataSO : BaseActionDataSO
 {
     public override ActionDataType ActionType => ActionDataType.Random;

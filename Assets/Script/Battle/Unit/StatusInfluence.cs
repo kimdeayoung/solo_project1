@@ -1,15 +1,18 @@
-using NUnit.Framework;
 using UnityEngine;
 
 public abstract class StatusInfluence
 {
-    protected BattleUnit unit;
+    protected BattleUnit owner;
     public abstract StatusInfluenceType InfluenceType { get; }
+    public AddStatusInfluenceType AddStatusInfluenceType { get; private set; }
     public float Duration { get; protected set; }
 
-    public virtual void OnStart(BattleUnit unit)
+    public virtual void OnStart(BattleUnit unit, AddStatusInfluenceData data)
     {
-        this.unit = unit;
+        owner = unit;
+
+        AddStatusInfluenceType = data.addStatusInfluenceType;
+        Duration = data.duration;
     }
 
     protected abstract void OnEnd();
@@ -19,7 +22,7 @@ public abstract class StatusInfluence
         switch (data.addStatusInfluenceType)
         {
             case AddStatusInfluenceType.Independent:
-                Assert.True(false);
+                Debug.Assert(false);
                 break;
             case AddStatusInfluenceType.Stack:
                 Duration += data.duration;
@@ -32,5 +35,18 @@ public abstract class StatusInfluence
         Duration = 0.0f;
     }
 
-    public abstract bool OnUpdate(float deltaTime);
+    public virtual bool OnUpdate(float deltaTime)
+    {
+        if (Duration > 0.0f)
+        {
+            Duration -= deltaTime;
+        }
+
+        if (Duration < 0)
+        {
+            OnEnd();
+            return true;
+        }
+        return false;
+    }
 }

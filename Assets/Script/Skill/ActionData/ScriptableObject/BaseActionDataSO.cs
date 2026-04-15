@@ -13,8 +13,8 @@ public abstract class BaseActionDataSO : ScriptableObject
     [SerializeField] private int _actionResource;
     public int ActionResource => _actionResource;
 
-    [SerializeField] private ActionParameter[] _actionParameters;
-    public ActionParameter[] ActionParameters => _actionParameters;
+    [SerializeField] private ActionParameterSO[] _actionParameters;
+    public ActionParameterSO[] ActionParameters => _actionParameters;
 
     [SerializeField] private float _runDelay;
     public float RunDelay => _runDelay;

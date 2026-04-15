@@ -2,12 +2,17 @@ using UnityEngine;
 
 public abstract class ActionParameterSO : ScriptableObject
 {
-    [SerializeField] private float _runDelay;
-    public float RunDelay => _runDelay;
+    [SerializeField] private int parameterUniqueID;
+    public int ParameterUniqueID => parameterUniqueID;
 
-    [SerializeField] private float _duration;
-    public float Duration => _duration;
+    [SerializeField] private float runDelay;
+    public float RunDelay => runDelay;
 
-    [SerializeField] private string _animationName;
-    public string AnimationName => _animationName;
+    [SerializeField] private float duration;
+    public float ActionDuration => duration;
+
+    [SerializeField] private string animationName;
+    public string AnimationName => animationName;
+
+    public abstract ActionParameterType ActionParameterType { get; }
 }

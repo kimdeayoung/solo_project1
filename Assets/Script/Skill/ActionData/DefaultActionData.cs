@@ -8,18 +8,18 @@ public class DefaultActionData : BaseActionData
 
     public override ActionDataType ActionDataType => ActionDataType.Default;
 
-    public override void ResetVariables(BaseActionDataSO data)
+    public override void ResetVariables(BattleUnit owner, BaseActionDataSO data)
     {
-        base.ResetVariables(data);
+        base.ResetVariables(owner, data);
 
         DefaultActionDataSO defaultAction = data as DefaultActionDataSO;
         Debug.Assert(defaultAction != null);
 
-        ActionParameter[] actionParameters = defaultAction.ActionParameters;
+        ActionParameterSO[] actionParameters = defaultAction.ActionParameters;
         int actionParameterCount = actionParameters.Length;
         for (int i = 0; i < actionParameterCount; i++)
         {
-            _actionParameters.Add(actionParameters[i]);
+            _actionParameters.Add(ActionParameterPool.GetActionParameter(actionParameters[i]));
         }
     }
 

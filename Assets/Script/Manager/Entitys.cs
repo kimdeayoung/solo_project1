@@ -11,17 +11,30 @@ public class Entitys
     private BattleUnit player;
     private Dictionary<string, List<BattleUnit>> units;
 
-    private int _requestInstantiateCount;
-    public bool IsEmptyInstantiate => _requestInstantiateCount == 0;
+    private Dictionary<StatusInfluenceType, List<StatusInfluence>> statusInfluencePool;
+
+    private int requestInstantiateCount;
+    public bool IsEmptyInstantiate => requestInstantiateCount == 0;
 
     public Entitys()
     {
         loader = AddressableBundleLoader.Instance;
 
         ActionDataPool.Init();
+        ActionParameterPool.Init();
 
         activeBattleUnits = new List<BattleUnit>(512);
         units = new Dictionary<string, List<BattleUnit>>(8);
+
+        {
+            int statusInfluenceTypeCount = (int)StatusInfluenceType.Length;
+            statusInfluencePool = new Dictionary<StatusInfluenceType, List<StatusInfluence>>(statusInfluenceTypeCount);
+
+            for (int i = 0; i < statusInfluenceTypeCount; i++)
+            {
+                statusInfluencePool.Add((StatusInfluenceType)i, new List<StatusInfluence>(32));
+            }
+        }
 
         battleScene = GameManager.Instance.SceneInstance<Battle>();
         Debug.Assert(battleScene != null);
@@ -38,7 +51,7 @@ public class Entitys
             switch (data.objectType)
             {
                 case ObjectType.BattleUnit:
-                    ++_requestInstantiateCount;
+                    ++requestInstantiateCount;
                     loader.InstantiateAsync(data.assetName, battleScene.EntityRoot, OnCreateBattleUnit);
                     break;
             }
@@ -52,6 +65,25 @@ public class Entitys
         battleScene.SetPreLoadState(PreLoadCondition.Entitiy);
     }
 
+    public void OnUpdate(float deltaTime)
+    {
+        int loopCount = activeBattleUnits.Count;
+        for (int i = 0; i < loopCount; i++)
+        {
+            activeBattleUnits[i].OnUpdate(deltaTime);
+        }
+    }
+
+    public void OnFixedUpdate(float fixedDeltaTime)
+    {
+        int loopCount = activeBattleUnits.Count;
+        for (int i = 0; i < loopCount; i++)
+        {
+            activeBattleUnits[i].OnFixedUpdate(fixedDeltaTime);
+        }
+    }
+
+    #region BattleUnit
     /// <summary>
     /// 게임 내에서 사용할 데이터는 미리 생성하고 들어가게 적용
     /// 가능한 async로 인한 일부 데이터가 안보이는 경우 자체를 아예 없애려면 이러한 방법이 좋아보임..
@@ -75,7 +107,7 @@ public class Entitys
         if (units.Count < 8)
         {
             const int createCount = 16;
-            _requestInstantiateCount += createCount;
+            requestInstantiateCount += createCount;
             for (int i = 0; i < createCount; i++)
             {
                 loader.InstantiateAsync(assetName, battleScene.EntityRoot, OnCreateBattleUnit);
@@ -107,25 +139,7 @@ public class Entitys
                 units.Add(unit);
                 break;
         }
-        --_requestInstantiateCount;
-    }
-
-    public void OnUpdate(float deltaTime)
-    {
-        int loopCount = activeBattleUnits.Count;
-        for (int i = 0; i < loopCount; i++)
-        {
-            activeBattleUnits[i].OnUpdate(deltaTime);
-        }
-    }
-
-    public void OnFixedUpdate(float fixedDeltaTime)
-    {
-        int loopCount = activeBattleUnits.Count;
-        for (int i = 0; i < loopCount; i++)
-        {
-            activeBattleUnits[i].OnFixedUpdate(fixedDeltaTime);
-        }
+        --requestInstantiateCount;
     }
 
     public BattleUnit FindBattleUnitOrNull(BattleUnitType type)
@@ -151,5 +165,49 @@ public class Entitys
 
         return null;
     }
+    #endregion
+
+    #region StatusInfluence
+    public StatusInfluence GetStatusInfluence(StatusInfluenceType type)
+    {
+        StatusInfluence statusInfluence = null;
+        statusInfluencePool.TryGetValue(type, out List<StatusInfluence> statusInfluences);
+        int count = statusInfluences.Count;
+        if (count > 0)
+        {
+            statusInfluence = statusInfluences[^1];
+            statusInfluences.RemoveAt(count);
+        }
+        else
+        {
+            statusInfluence = CreateStatusInfluence(type);
+        }
+
+        return statusInfluence;
+    }
+
+    public void ReleaseStatusInfluence(StatusInfluence statusInfluence)
+    {
+        statusInfluencePool.TryGetValue(statusInfluence.InfluenceType, out List<StatusInfluence> statusInfluences);
+        statusInfluences.Add(statusInfluence);
+    }
+
+    private StatusInfluence CreateStatusInfluence(StatusInfluenceType type)
+    {
+        switch (type)
+        {
+            case StatusInfluenceType.Stun:
+                return new Stun();
+
+            case StatusInfluenceType.MoveSpeedUp:
+                return new MoveSpeedUp();
+
+            case StatusInfluenceType.MoveSpeedDown:
+                return new MoveSpeedDown();
+        }
+
+        return null;
+    }
+    #endregion
 }
 

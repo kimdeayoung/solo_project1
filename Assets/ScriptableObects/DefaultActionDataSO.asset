@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5048f532da6623e469a9c2f69ee8c35a, type: 3}
+  m_Name: DefaultActionDataSO
+  m_EditorClassIdentifier: Assembly-CSharp::DefaultActionDataSO
+  _coolTime: 10
+  _actionResourceType: 0
+  _actionResource: 0
+  _actionParameters:
+  - {fileID: 11400000, guid: 3e7b40c4ab9bceb4a959faf1a0e98ec6, type: 2}
+  _runDelay: 0
+  _afterActionSO: {fileID: 0}
