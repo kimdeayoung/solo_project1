@@ -10,6 +10,12 @@ public enum TableLoadType
     Binary,
 }
 
+public enum SearchMethodType
+{
+    Self,
+    ByDistance,
+}
+
 public enum ObjectType
 {
     BattleUnit,

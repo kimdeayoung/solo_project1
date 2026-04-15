@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public abstract class BattleUnit : MonoBehaviour
+public abstract class BattleUnit : WorldObject
 {
     public abstract BattleUnitType Type { get; }
     public ActionResourceType ResourceType { get; protected set; }
