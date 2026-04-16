@@ -1,16 +1,10 @@
+using Cysharp.Threading.Tasks;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.UI;
-
-public struct BtnUIData
-{
-    public string imageName;
-    
-    public Action onClickBtn;
-}
 
 public class ActionBtn : MonoBehaviour
 {
@@ -20,16 +14,25 @@ public class ActionBtn : MonoBehaviour
     [SerializeField]
     private Image cooltimeCover;
 
-    private Action onClickBtn;
+    private BaseActionData actionData;
 
-    public void Init(BtnUIData uiData)
+    public void Init(BaseActionData actionData)
     {
-        btnImage.SetSprite(uiData.imageName);
-        onClickBtn = uiData.onClickBtn;
+        btnImage.SetSprite(actionData.IconName);
+
+        this.actionData = actionData;
     }
+
+    //private void Update()
+    //{
+    //    //TODO: cooltimeCover 작동 기능 추가
+    //}
 
     public void OnClickBtn()
     {
-        onClickBtn?.Invoke();
+        if (actionData.IsExecuteAble())
+        {
+            actionData.Execute().Forget();
+        }
     }
 }

@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ApplyStatusInfluenceParameterSO
   parameterUniqueID: 1
   runDelay: 0
-  duration: 0.3
+  duration: 0
   animationName: 
   influenceType: 1
   addStatusInfluenceType: 0
-  statusInfluenceDuration: 0.3
+  statusInfluenceDuration: 200
   value: 30

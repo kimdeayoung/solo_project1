@@ -24,9 +24,16 @@ public abstract class ActionParameter
 
     public async void RunAction(List<WorldObject> target, CancellationToken token)
     {
-        bool isCanceled = await UniTask.WaitForSeconds(RunDelay, cancellationToken: token).SuppressCancellationThrow();
+        if (RunDelay > 0)
+        {
+            bool isCanceled = await UniTask.WaitForSeconds(RunDelay, cancellationToken: token).SuppressCancellationThrow();
 
-        if (!isCanceled)
+            if (!isCanceled)
+            {
+                RunAction_Impl(target);
+            }
+        }
+        else
         {
             RunAction_Impl(target);
         }

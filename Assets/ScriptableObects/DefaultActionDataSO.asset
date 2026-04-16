@@ -21,13 +21,14 @@ MonoBehaviour:
   coolTime: 0
   actionResourceType: 0
   actionResource: 0
-  actionParameters: []
+  actionParameters:
+  - {fileID: 11400000, guid: 3e7b40c4ab9bceb4a959faf1a0e98ec6, type: 2}
   runDelay: 0
   icon:
-    m_AssetGUID: a45d64a14f21e0d4787a02a9ad46c298
+    m_AssetGUID: e55d4f9d5a6f8854cbc85bc8ec70822e
     m_SubObjectName: 
     m_SubObjectType: 
     m_SubObjectGUID: 
-    m_EditorAssetChanged: 1
-    assetName: 
+    m_EditorAssetChanged: 0
+    assetName: Icon/34.png
   _afterActionSO: {fileID: 0}

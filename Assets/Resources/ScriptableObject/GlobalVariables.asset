@@ -16,4 +16,4 @@ MonoBehaviour:
   followCamRotation: {x: 35.6, y: -51.67, z: 0}
   unitStatusGlobalVariables:
     minMoveSpeed: 1
-    maxMoveSpeed: 200
+    maxMoveSpeed: 500

@@ -36,7 +36,7 @@ public class StatusAttributes
 
     public void ChangeMoveSpeed(float value)
     {
-        float computeVal = moveSpeed.OrigianlValue - value;
+        float computeVal = moveSpeed.OrigianlValue + value;
         float clampVal = computeVal;
 
         UnitStatusGlobalVariables variables = GameManager.Instance.GlobalVariables.UnitStatusGlobalVariables;

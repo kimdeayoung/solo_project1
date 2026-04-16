@@ -84,7 +84,7 @@ public class Player : BattleUnit
         forward.y = 0f;
         forward.Normalize();
 
-        Vector3 move = forward * _stat.MoveSpeed * moveIntensity * fixedDeltaTime;
+        Vector3 move = forward * Status.StatusAttributes.MoveSpeed * moveIntensity * fixedDeltaTime;
         rigidBody.MovePosition(rigidBody.position + move);
     }
 }

@@ -2,7 +2,7 @@ using Cysharp.Threading.Tasks;
 using System.Threading;
 using System.Diagnostics;
 using System.Collections.Generic;
-using UnityEngine.Pool;
+using Unity.VisualScripting;
 
 public readonly struct ActionResourceData
 {
@@ -25,16 +25,20 @@ public abstract class BaseActionData
     public abstract ActionDataType ActionDataType { get; }
 
     protected BattleUnit owner;
-    private ActionResourceData _resourceData;
+    private ActionResourceData resourceData;
 
     private SearchMethod searchMethod;
     private List<WorldObject> searchResult;
     private HashSet<int> searchIngoreTarget;
 
-    private float _coolTime;
-    private bool _isUpdateAble;
+    private float coolTime;
+    public float CooltimeRatio => coolTime / resourceData.coolTime;
 
-    private float _runDelay;
+    private bool isUpdateAble;
+
+    private float runDelay;
+
+    public string IconName { get; private set; }
 
     protected CancellationTokenSource cancelToken;
 
@@ -44,14 +48,16 @@ public abstract class BaseActionData
         Debug.Assert(entitys != null);
 
         this.owner = owner;
-        _resourceData = new ActionResourceData(data);
+        resourceData = new ActionResourceData(data);
 
         searchMethod = entitys.GetSearchMethod(data.SearchMethodType, data.SearchMethod);
 
-        _coolTime = _resourceData.coolTime;
-        _isUpdateAble = true;
+        coolTime = resourceData.coolTime;
+        isUpdateAble = true;
 
-        _runDelay = data.RunDelay;
+        runDelay = data.RunDelay;
+
+        IconName = data.IconName;
 
         searchResult = new List<WorldObject>();
         searchIngoreTarget = new HashSet<int>();
@@ -63,31 +69,31 @@ public abstract class BaseActionData
 
     public bool IsExecuteAble()
     {
-        if (!_isUpdateAble)
+        if (!isUpdateAble)
         {
             return false;
         }
 
-        if (!owner.HasEnoughActionResource(_resourceData))
+        if (!owner.HasEnoughActionResource(resourceData))
         {
             return false;
         }
 
-        return _coolTime <= 0.0f;
+        return coolTime <= 0.0f;
     }
 
     public void OnUpdate(float deltaTime, float hasteValue)
     {
-        if (!_isUpdateAble)
+        if (!isUpdateAble)
         {
             return;
         }
 
         float speedMultiplier = 1.0f + hasteValue;
-        _coolTime -= deltaTime * speedMultiplier;
+        coolTime -= deltaTime * speedMultiplier;
     }
 
-    public async void Execute()
+    public async UniTask Execute()
     {
         Debug.Assert(IsExecuteAble());
 
@@ -100,11 +106,11 @@ public abstract class BaseActionData
             return;
         }
 
-        _isUpdateAble = false;
-        Debug.Assert(owner.HasEnoughActionResource(_resourceData));
-        owner.UseActionResource(_resourceData);
+        isUpdateAble = false;
+        Debug.Assert(owner.HasEnoughActionResource(resourceData));
+        owner.UseActionResource(resourceData);
 
-        bool isCanceled = await UniTask.WaitForSeconds(_runDelay, cancellationToken: cancelToken.Token).SuppressCancellationThrow();
+        bool isCanceled = await UniTask.WaitForSeconds(runDelay, cancellationToken: cancelToken.Token).SuppressCancellationThrow();
 
         float actionDuration = 0.0f;
         if (!isCanceled)
@@ -112,12 +118,13 @@ public abstract class BaseActionData
             actionDuration = RunActions(searchResult);
         }
 
-        isCanceled = await UniTask.WaitForSeconds(actionDuration, cancellationToken: cancelToken.Token).SuppressCancellationThrow();
-        if (!isCanceled)
+        if (actionDuration > 0.0f)
         {
-            _coolTime = _resourceData.coolTime;
-            _isUpdateAble = true;
+            await UniTask.WaitForSeconds(actionDuration, cancellationToken: cancelToken.Token).SuppressCancellationThrow();
         }
+
+        coolTime = resourceData.coolTime;
+        isUpdateAble = true;
 
         searchIngoreTarget.Clear();
         searchResult.Clear();
@@ -127,7 +134,7 @@ public abstract class BaseActionData
 
     public void Stop()
     {
-        _isUpdateAble = false;
+        isUpdateAble = false;
 
         cancelToken.Cancel();
         cancelToken.Dispose();
@@ -136,7 +143,7 @@ public abstract class BaseActionData
 
     public virtual void Release()
     {
-        _isUpdateAble = false;
+        isUpdateAble = false;
 
         Entitys entitys = GameManager.Instance.SceneInstance<Battle>().Entity;
         Debug.Assert(entitys != null);

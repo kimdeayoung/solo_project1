@@ -27,7 +27,7 @@ public abstract class BaseActionDataSO : ScriptableObject
     public float RunDelay => runDelay;
 
     [SerializeField] private ObjectReference<Sprite> icon;
-    public AssetReferenceSprite refer;
+    public string IconName => icon.AssetName;
 
     [SerializeField] private BaseActionDataSO _afterActionSO;
     public BaseActionDataSO AfterActionSO => _afterActionSO;

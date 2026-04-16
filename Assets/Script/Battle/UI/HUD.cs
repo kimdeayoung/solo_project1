@@ -21,7 +21,22 @@ public class HUD : UIBase
     {
         this.player = player;
 
-        //IReadOnlyList<BaseActionData> baseActions = player.ActionDatas;
+        IReadOnlyList<BaseActionData> baseActions = player.ActionDatas;
+        int actionCount = baseActions.Count;
+
+        int loopCount = actionBtns.Length;
+        for (int i = 0; i < loopCount; i++)
+        {
+            if (actionCount > i)
+            {
+                actionBtns[i].Init(baseActions[i]);
+                actionBtns[i].gameObject.SetActive(true);
+            }
+            else
+            {
+                actionBtns[i].gameObject.SetActive(false);
+            }
+        }
     }
 
     private void UpdatePlayerMoveDirection(Vector2 direction, float moveIntensity)

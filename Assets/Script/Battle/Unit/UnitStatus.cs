@@ -5,6 +5,7 @@ public abstract class UnitStatus
 {
     protected WorldObject owner;
     private StatusAttributes statusAttributes;
+    public StatusAttributes StatusAttributes => statusAttributes;
 
     protected StatusInfluenceInfo influenceInfo;
 

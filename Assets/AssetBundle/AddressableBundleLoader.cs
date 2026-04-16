@@ -84,9 +84,9 @@ public class AddressableBundleLoader : Singleton<AddressableBundleLoader>
         return locations.Count;
     }
 
-    public async UniTask LoadAssetsAsync(string labelName, Action<UnityEngine.Object> onAssetLoadEnd, Action onFinished = null)
+    public async UniTask LoadSpritesAsync(string labelName, Action<Sprite> onAssetLoadEnd, Action onFinished = null)
     {
-        AsyncOperationHandle<IList<IResourceLocation>> locationsHandle = Addressables.LoadResourceLocationsAsync(labelName);
+        AsyncOperationHandle<IList<IResourceLocation>> locationsHandle = Addressables.LoadResourceLocationsAsync(labelName, typeof(Sprite));
 
         IList<IResourceLocation> locations = await locationsHandle.ToUniTask();
 
@@ -94,10 +94,10 @@ public class AddressableBundleLoader : Singleton<AddressableBundleLoader>
 
         foreach (IResourceLocation location in locations)
         {
-            AsyncOperationHandle<UnityEngine.Object> handle = Addressables.LoadAssetAsync<UnityEngine.Object>(location);
+            AsyncOperationHandle<Sprite> handle = Addressables.LoadAssetAsync<Sprite>(location);
             string assetName = location.PrimaryKey;
             bool added = operationHandles.TryAdd(assetName, default);
-            handle.Completed += (AsyncOperationHandle<UnityEngine.Object> result) =>
+            handle.Completed += (AsyncOperationHandle<Sprite> result) =>
             {
 #if UNITY_EDITOR
                 Debug.Assert(added, $"Asset Name: {assetName}");
@@ -116,7 +116,7 @@ public class AddressableBundleLoader : Singleton<AddressableBundleLoader>
         onFinished?.Invoke();
     }
 
-    public async UniTask LoadAssetsAsync(LoadLabelsData data, Action<UnityEngine.Object> onAssetLoadEnd, Action onFinished = null)
+    public async UniTask LoadSpritesAsync(LoadLabelsData data, Action<Sprite> onAssetLoadEnd, Action onFinished = null)
     {
         AsyncOperationHandle<IList<IResourceLocation>> locationsHandle = Addressables.LoadResourceLocationsAsync(data.labels, data.mergeMode);
 
@@ -126,10 +126,75 @@ public class AddressableBundleLoader : Singleton<AddressableBundleLoader>
 
         foreach (IResourceLocation location in locations)
         {
-            AsyncOperationHandle<UnityEngine.Object> handle = Addressables.LoadAssetAsync<UnityEngine.Object>(location);
+            AsyncOperationHandle<Sprite> handle = Addressables.LoadAssetAsync<Sprite>(location);
             string assetName = location.PrimaryKey;
             bool added = operationHandles.TryAdd(assetName, default);
-            handle.Completed += (AsyncOperationHandle<UnityEngine.Object> result) =>
+            handle.Completed += (AsyncOperationHandle<Sprite> result) =>
+            {
+#if UNITY_EDITOR
+                Debug.Assert(added, $"Asset Name: {assetName}");
+#endif
+                if (added)
+                {
+                    operationHandles[assetName] = result;
+                }
+                onAssetLoadEnd?.Invoke(result.Result);
+            };
+            loadOps.Add(handle);
+        }
+
+        await Addressables.ResourceManager.CreateGenericGroupOperation(loadOps, true);
+
+        onFinished?.Invoke();
+    }
+
+
+    public async UniTask LoadAssetsAsync<T>(string labelName, Action<T> onAssetLoadEnd, Action onFinished = null) where T : UnityEngine.Object
+    {
+        AsyncOperationHandle<IList<IResourceLocation>> locationsHandle = Addressables.LoadResourceLocationsAsync(labelName, typeof(T));
+
+        IList<IResourceLocation> locations = await locationsHandle.ToUniTask();
+
+        var loadOps = new List<AsyncOperationHandle>(locationsHandle.Result.Count);
+
+        foreach (IResourceLocation location in locations)
+        {
+            AsyncOperationHandle<T> handle = Addressables.LoadAssetAsync<T>(location);
+            string assetName = location.PrimaryKey;
+            bool added = operationHandles.TryAdd(assetName, default);
+            handle.Completed += (AsyncOperationHandle<T> result) =>
+            {
+#if UNITY_EDITOR
+                Debug.Assert(added, $"Asset Name: {assetName}");
+#endif
+                if (added)
+                {
+                    operationHandles[assetName] = result;
+                }
+                onAssetLoadEnd?.Invoke(result.Result);
+            };
+            loadOps.Add(handle);
+        }
+
+        await Addressables.ResourceManager.CreateGenericGroupOperation(loadOps, false);
+
+        onFinished?.Invoke();
+    }
+
+    public async UniTask LoadAssetsAsync<T>(LoadLabelsData data, Action<T> onAssetLoadEnd, Action onFinished = null) where T : UnityEngine.Object
+    {
+        AsyncOperationHandle<IList<IResourceLocation>> locationsHandle = Addressables.LoadResourceLocationsAsync(data.labels, data.mergeMode, typeof(T));
+
+        IList<IResourceLocation> locations = await locationsHandle.ToUniTask();
+
+        var loadOps = new List<AsyncOperationHandle>(locationsHandle.Result.Count);
+
+        foreach (IResourceLocation location in locations)
+        {
+            AsyncOperationHandle<T> handle = Addressables.LoadAssetAsync<T>(location);
+            string assetName = location.PrimaryKey;
+            bool added = operationHandles.TryAdd(assetName, default);
+            handle.Completed += (AsyncOperationHandle<T> result) =>
             {
 #if UNITY_EDITOR
                 Debug.Assert(added, $"Asset Name: {assetName}");

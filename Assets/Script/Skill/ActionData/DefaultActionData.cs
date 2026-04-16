@@ -41,7 +41,7 @@ public class DefaultActionData : BaseActionData
                 animationName = actionParameter.AnimationName;
             }
 
-            actionParameter.RunAction(null, token);
+            actionParameter.RunAction(searchResult, token);
         }
         owner.RunAnimation(animationName);
 

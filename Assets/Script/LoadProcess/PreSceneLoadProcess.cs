@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
 public class PreSceneLoadProcess
 {
@@ -11,6 +12,7 @@ public class PreSceneLoadProcess
     public float Percent { get; private set; }
 
     protected List<string> singleAssetNames;
+    protected List<string> spriteLabelNames;
 
     protected List<string> labelNames;
     protected List<LoadLabelsData> labelsDatas;
@@ -30,6 +32,15 @@ public class PreSceneLoadProcess
         if (singleAssetNames != null)
         {
             totalLoadCount += singleAssetNames.Count;
+        }
+
+        if (spriteLabelNames != null)
+        {
+            int labelCount = spriteLabelNames.Count;
+            for (int i = 0; i < labelCount; i++)
+            {
+                totalLoadCount += await loader.GetResourceLocationCount(spriteLabelNames[i]);
+            }
         }
 
         if (labelNames != null)
@@ -66,12 +77,21 @@ public class PreSceneLoadProcess
             }
         }
 
+        if (spriteLabelNames != null)
+        {
+            int labelCount = spriteLabelNames.Count;
+            for (int i = 0; i < labelCount; i++)
+            {
+                loader.LoadAssetsAsync<Sprite>(spriteLabelNames[i], AssetLoadSuccess).Forget();
+            }
+        }
+
         if (labelNames != null)
         {
             int labelCount = labelNames.Count;
             for (int i = 0; i < labelCount; i++)
             {
-                loader.LoadAssetsAsync(labelNames[i], AssetLoadSuccess).Forget();
+                loader.LoadAssetsAsync<UnityEngine.Object>(labelNames[i], AssetLoadSuccess).Forget();
             }
         }
 
@@ -80,7 +100,7 @@ public class PreSceneLoadProcess
             int labelCount = labelsDatas.Count;
             for (int i = 0; i < labelCount; i++)
             {
-                loader.LoadAssetsAsync(labelsDatas[i], AssetLoadSuccess).Forget();
+                loader.LoadAssetsAsync<UnityEngine.Object>(labelsDatas[i], AssetLoadSuccess).Forget();
             }
         }
     }
@@ -121,6 +141,14 @@ public class PreSceneLoadProcess
     {
 #if UNITY_EDITOR
         Debug.Log($"Load Success: {obj.name}");
+#endif
+        OnLoadProcessEnd();
+    }
+
+    private void AssetLoadSuccess(Sprite sprite)
+    {
+#if UNITY_EDITOR
+        Debug.Log($"Load Success: {sprite.name}");
 #endif
         OnLoadProcessEnd();
     }

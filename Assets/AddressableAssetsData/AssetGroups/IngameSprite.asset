@@ -19,7 +19,7 @@ MonoBehaviour:
     m_Address: Icon
     m_ReadOnly: 0
     m_SerializedLabels:
-    - IngameUI
+    - IngameSprite
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 9e0da4cb01b882740b8c086964429468, type: 2}

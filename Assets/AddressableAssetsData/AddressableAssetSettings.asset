@@ -15,7 +15,7 @@ MonoBehaviour:
   m_DefaultGroup: b9bb5b78b67bff94eab33f6cc8f935d1
   m_currentHash:
     serializedVersion: 2
-    Hash: 847b0157c878e524566301c6c714fe20
+    Hash: b190aee3a247daf37cc2e5d5d1440357
   m_OptimizeCatalogSize: 0
   m_BuildRemoteCatalog: 0
   m_CatalogRequestsTimeout: 0
@@ -106,6 +106,7 @@ MonoBehaviour:
     m_LabelNames:
     - IngamePrefab
     - IngameUI
+    - IngameSprite
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: c1e4a2275e915f94ca165719f2a78a5a, type: 2}
