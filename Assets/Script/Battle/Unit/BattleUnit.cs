@@ -8,7 +8,6 @@ public abstract class BattleUnit : WorldObject
 
     public string AssetName { get; private set; }
 
-    public UnitStatus Status { get; protected set; }
     public IBehaviourController BehaviourController { get; private set; }
 
     [SerializeField] protected Animator animator;
@@ -27,11 +26,6 @@ public abstract class BattleUnit : WorldObject
 
     public abstract void OnUpdate(float deltaTime);
     public abstract void OnFixedUpdate(float fixedDeltaTime);
-
-    public bool IsAlive()
-    {
-        return Status.IsAlive();
-    }
 
     public virtual bool HasEnoughActionResource(ActionResourceData data)
     {

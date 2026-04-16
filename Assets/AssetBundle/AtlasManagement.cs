@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.U2D;
 using System;
 using UnityEngine.UI;
+using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
 public class AtlasInfo
 {
@@ -175,29 +176,25 @@ public class AtlasManagement
 
 public static class ImageExtensions
 {
-    public static void SetAtlasSprite(this Image image, string spriteName)
+    public static void SetSprite(this Image image, string spriteName)
     {
         Debug.Assert(!string.IsNullOrEmpty(spriteName), "spriteName is Null or Empty");
 
-        Sprite sprite = AddressableBundleLoader.Instance.AtlasManagement.GetSpriteOrNull(spriteName);
+        Sprite sprite = AddressableBundleLoader.Instance.TryGetLoadedAsset<Sprite>(spriteName);
 
-        Debug.Assert(sprite != null, $"Sprite Can't Find Check Atlas Or SpriteName Name : {spriteName}");
+        Debug.Assert(sprite != null, $"Sprite Can't Find Check SpriteName Name : {spriteName}");
         image.sprite = sprite;
     }
 }
 
 public static class RawImageExtensions
 {
-    public static void SetRawSpriteAsync(this RawImage image, string rawSpriteName, Action onSuccess, Action<string> onFailed)
+    public static void SetRawSpriteAsync(this RawImage image, string rawSpriteName)
     {
         Debug.Assert(!string.IsNullOrEmpty(rawSpriteName), "RawSpriteName is Null or Empty");
-        AddressableBundleLoader.Instance.LoadAssetAsync(rawSpriteName, (Texture texture) =>
-        {
-            if (image != null)
-            {
-                image.texture = texture;
-            }
-            onSuccess?.Invoke();
-        }, onFailed);
+
+        Texture texture = AddressableBundleLoader.Instance.TryGetLoadedAsset<Texture>(rawSpriteName);
+        Debug.Assert(texture != null, $"RawSpriteName Can't Find Check Texture Name : {rawSpriteName}");
+        image.texture = texture;
     }
 }

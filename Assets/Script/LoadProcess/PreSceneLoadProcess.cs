@@ -11,7 +11,6 @@ public class PreSceneLoadProcess
     public float Percent { get; private set; }
 
     protected List<string> singleAssetNames;
-    protected List<string> atlasAssetNames;
 
     protected List<string> labelNames;
     protected List<LoadLabelsData> labelsDatas;
@@ -31,10 +30,6 @@ public class PreSceneLoadProcess
         if (singleAssetNames != null)
         {
             totalLoadCount += singleAssetNames.Count;
-        }
-        if (atlasAssetNames != null)
-        {
-            totalLoadCount += atlasAssetNames.Count;
         }
 
         if (labelNames != null)
@@ -71,15 +66,6 @@ public class PreSceneLoadProcess
             }
         }
 
-        if (atlasAssetNames != null)
-        {
-            int atlasAssetCount = atlasAssetNames.Count;
-            for (int i = 0; i < atlasAssetCount; i++)
-            {
-                loader.LoadSpriteAtlasAsync(atlasAssetNames[i], AssetLoadSuccess);
-            }
-        }
-
         if (labelNames != null)
         {
             int labelCount = labelNames.Count;
@@ -108,15 +94,6 @@ public class PreSceneLoadProcess
             for (int i = 0; i < singleAssetLoadCount; i++)
             {
                 loader.ReleaseLoadedAsset(singleAssetNames[i]);
-            }
-        }
-
-        if (atlasAssetNames != null)
-        {
-            int atlasAssetCount = atlasAssetNames.Count;
-            for (int i = 0; i < atlasAssetCount; i++)
-            {
-                loader.AtlasManagement.ReleaseSpecificAtlasInfo(atlasAssetNames[i]);
             }
         }
 

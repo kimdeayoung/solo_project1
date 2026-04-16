@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using System.Threading;
 using System.Diagnostics;
 using System.Collections.Generic;
+using UnityEngine.Pool;
 
 public readonly struct ActionResourceData
 {
@@ -26,6 +27,10 @@ public abstract class BaseActionData
     protected BattleUnit owner;
     private ActionResourceData _resourceData;
 
+    private SearchMethod searchMethod;
+    private List<WorldObject> searchResult;
+    private HashSet<int> searchIngoreTarget;
+
     private float _coolTime;
     private bool _isUpdateAble;
 
@@ -35,14 +40,21 @@ public abstract class BaseActionData
 
     public virtual void ResetVariables(BattleUnit owner, BaseActionDataSO data)
     {
+        Entitys entitys = GameManager.Instance.SceneInstance<Battle>().Entity;
+        Debug.Assert(entitys != null);
+
         this.owner = owner;
         _resourceData = new ActionResourceData(data);
+
+        searchMethod = entitys.GetSearchMethod(data.SearchMethodType, data.SearchMethod);
 
         _coolTime = _resourceData.coolTime;
         _isUpdateAble = true;
 
         _runDelay = data.RunDelay;
 
+        searchResult = new List<WorldObject>();
+        searchIngoreTarget = new HashSet<int>();
         if (cancelToken == null)
         {
             cancelToken = new CancellationTokenSource();
@@ -51,6 +63,11 @@ public abstract class BaseActionData
 
     public bool IsExecuteAble()
     {
+        if (!_isUpdateAble)
+        {
+            return false;
+        }
+
         if (!owner.HasEnoughActionResource(_resourceData))
         {
             return false;
@@ -74,6 +91,15 @@ public abstract class BaseActionData
     {
         Debug.Assert(IsExecuteAble());
 
+        searchIngoreTarget.Add(owner.GetInstanceID());
+        searchMethod.Run(owner, searchIngoreTarget, searchResult);
+        if (searchResult.Count == 0)
+        {
+            searchIngoreTarget.Clear();
+            searchResult.Clear();
+            return;
+        }
+
         _isUpdateAble = false;
         Debug.Assert(owner.HasEnoughActionResource(_resourceData));
         owner.UseActionResource(_resourceData);
@@ -83,7 +109,7 @@ public abstract class BaseActionData
         float actionDuration = 0.0f;
         if (!isCanceled)
         {
-            actionDuration = RunActions();
+            actionDuration = RunActions(searchResult);
         }
 
         isCanceled = await UniTask.WaitForSeconds(actionDuration, cancellationToken: cancelToken.Token).SuppressCancellationThrow();
@@ -92,9 +118,12 @@ public abstract class BaseActionData
             _coolTime = _resourceData.coolTime;
             _isUpdateAble = true;
         }
+
+        searchIngoreTarget.Clear();
+        searchResult.Clear();
     }
 
-    protected abstract float RunActions();
+    protected abstract float RunActions(List<WorldObject> searchResult);
 
     public void Stop()
     {
@@ -108,6 +137,14 @@ public abstract class BaseActionData
     public virtual void Release()
     {
         _isUpdateAble = false;
+
+        Entitys entitys = GameManager.Instance.SceneInstance<Battle>().Entity;
+        Debug.Assert(entitys != null);
+
+        entitys.ReleaseSearchMethod(searchMethod);
+
+        searchIngoreTarget.Clear();
+        searchResult.Clear();
     }
 }
 

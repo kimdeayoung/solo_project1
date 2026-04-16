@@ -1,16 +1,14 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
 public abstract class UnitStatus
 {
-    protected BattleUnit owner;
+    protected WorldObject owner;
     private StatusAttributes statusAttributes;
 
     protected StatusInfluenceInfo influenceInfo;
 
-    public UnitStatus(BattleUnit owner, UnitStat stat)
+    public UnitStatus(WorldObject owner, UnitStat stat)
     {
         this.owner = owner;
         influenceInfo = new StatusInfluenceInfo(owner);
@@ -55,7 +53,12 @@ public abstract class UnitStatus
     {
         if (statusAttributes.StunCount == 0)
         {
-            owner.BehaviourController.SetBehaviourState(UnitState.Stun);
+            switch (owner)
+            {
+                case BattleUnit battleUnit:
+                    battleUnit.BehaviourController.SetBehaviourState(UnitState.Stun);
+                    break;
+            }
         }
         statusAttributes.IncreaseStunCount();
     }
@@ -63,11 +66,18 @@ public abstract class UnitStatus
     public void DecreaseStunCount()
     {
         statusAttributes.DecreaseStunCount();
+        if (!IsAlive())
+        {
+            return;
+        }
+
         if (statusAttributes.StunCount == 0)
         {
-            if (IsAlive())
+            switch (owner)
             {
-                owner.BehaviourController.SetBehaviourState(UnitState.Idle);
+                case BattleUnit battleUnit:
+                    battleUnit.BehaviourController.SetBehaviourState(UnitState.Idle);
+                    break;
             }
         }
     }

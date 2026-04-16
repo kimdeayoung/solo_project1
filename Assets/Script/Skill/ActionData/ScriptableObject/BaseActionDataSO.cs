@@ -1,23 +1,33 @@
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 
 
 public abstract class BaseActionDataSO : ScriptableObject
 {
     public abstract ActionDataType ActionType { get; }
 
-    [SerializeField] private float _coolTime;
-    public float CoolTime => _coolTime;
+    [SerializeField] private SearchMethodType searchMethodType;
+    public SearchMethodType SearchMethodType => searchMethodType;
 
-    [SerializeField] private ActionResourceType _actionResourceType;
-    public ActionResourceType ActionResourceType => _actionResourceType;
-    [SerializeField] private int _actionResource;
-    public int ActionResource => _actionResource;
+    [SerializeField] private SearchMethodProperty searchMethod;
+    public SearchMethodProperty SearchMethod => searchMethod;
 
-    [SerializeField] private ActionParameterSO[] _actionParameters;
-    public ActionParameterSO[] ActionParameters => _actionParameters;
+    [SerializeField] private float coolTime;
+    public float CoolTime => coolTime;
 
-    [SerializeField] private float _runDelay;
-    public float RunDelay => _runDelay;
+    [SerializeField] private ActionResourceType actionResourceType;
+    public ActionResourceType ActionResourceType => actionResourceType;
+    [SerializeField] private int actionResource;
+    public int ActionResource => actionResource;
+
+    [SerializeField] private ActionParameterSO[] actionParameters;
+    public ActionParameterSO[] ActionParameters => actionParameters;
+
+    [SerializeField] private float runDelay;
+    public float RunDelay => runDelay;
+
+    [SerializeField] private ObjectReference<Sprite> icon;
+    public AssetReferenceSprite refer;
 
     [SerializeField] private BaseActionDataSO _afterActionSO;
     public BaseActionDataSO AfterActionSO => _afterActionSO;

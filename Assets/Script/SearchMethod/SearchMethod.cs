@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -16,10 +15,11 @@ public abstract class SearchMethod
     public abstract void Run(WorldObject caster, HashSet<int> ignoreInstanceID, List<WorldObject> results);
 }
 
-public readonly struct SearchMethodProperty
+[Serializable]
+public struct SearchMethodProperty
 {
-    public readonly float range;
-    public readonly LayerMask layer;
+    public float range;
+    public LayerMask layer;
 
     public SearchMethodProperty(float range, LayerMask layer)
     {
@@ -81,6 +81,29 @@ public static class SearchMethodFuncs
         }
 
         return result;
+    }
+
+    public static void SearchWorldObjects(Vector3 position, LayerMask layer, float range, HashSet<int> ignoreInstanceID, List<WorldObject> result)
+    {
+        int count = Physics.OverlapSphereNonAlloc(position, range, colliders, layer);
+
+        if (count == 0)
+        {
+            return;
+        }
+
+        for (int i = 0; i < count; i++)
+        {
+            DetectableComponent detectableComponent = colliders[0].GetComponent<DetectableComponent>();
+            WorldObject worldObject = detectableComponent.WorldObject;
+
+            if (ignoreInstanceID != null && ignoreInstanceID.Contains(worldObject.GetInstanceID()))
+            {
+                continue;
+            }
+
+            result.Add(worldObject);
+        }
     }
 }
 

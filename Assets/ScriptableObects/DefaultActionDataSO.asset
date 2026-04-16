@@ -12,10 +12,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5048f532da6623e469a9c2f69ee8c35a, type: 3}
   m_Name: DefaultActionDataSO
   m_EditorClassIdentifier: Assembly-CSharp::DefaultActionDataSO
-  _coolTime: 10
-  _actionResourceType: 0
-  _actionResource: 0
-  _actionParameters:
-  - {fileID: 11400000, guid: 3e7b40c4ab9bceb4a959faf1a0e98ec6, type: 2}
-  _runDelay: 0
+  searchMethodType: 0
+  searchMethod:
+    range: 0
+    layer:
+      serializedVersion: 2
+      m_Bits: 0
+  coolTime: 0
+  actionResourceType: 0
+  actionResource: 0
+  actionParameters: []
+  runDelay: 0
+  icon:
+    m_AssetGUID: a45d64a14f21e0d4787a02a9ad46c298
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 1
+    assetName: 
   _afterActionSO: {fileID: 0}

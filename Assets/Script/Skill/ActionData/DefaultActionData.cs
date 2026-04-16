@@ -23,7 +23,7 @@ public class DefaultActionData : BaseActionData
         }
     }
 
-    protected override float RunActions()
+    protected override float RunActions(List<WorldObject> searchResult)
     {
         float duration = 0.0f;
         int actionParameterCount = _actionParameters.Count;

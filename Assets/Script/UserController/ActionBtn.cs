@@ -24,7 +24,7 @@ public class ActionBtn : MonoBehaviour
 
     public void Init(BtnUIData uiData)
     {
-        btnImage.SetAtlasSprite(uiData.imageName);
+        btnImage.SetSprite(uiData.imageName);
         onClickBtn = uiData.onClickBtn;
     }
 

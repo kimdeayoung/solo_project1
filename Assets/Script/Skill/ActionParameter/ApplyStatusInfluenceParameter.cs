@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class ApplyStatusInfluenceParameter : ActionParameter
@@ -12,8 +13,12 @@ public class ApplyStatusInfluenceParameter : ActionParameter
         addStatusInfluenceData = new AddStatusInfluenceData(applyStatusInfluence);
     }
 
-    protected override void RunAction_Impl(BattleUnit target)
+    protected override void RunAction_Impl(List<WorldObject> target)
     {
-        target.Status.ApplyStatusInfluence(addStatusInfluenceData);
+        int loopCount = target.Count;
+        for (int i = 0; i < loopCount; i++)
+        {
+            target[i].Status.ApplyStatusInfluence(addStatusInfluenceData);
+        }
     }
 }

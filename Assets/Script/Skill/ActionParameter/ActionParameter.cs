@@ -22,7 +22,7 @@ public abstract class ActionParameter
         AnimationName = data.AnimationName;
     }
 
-    public async void RunAction(BattleUnit target, CancellationToken token)
+    public async void RunAction(List<WorldObject> target, CancellationToken token)
     {
         bool isCanceled = await UniTask.WaitForSeconds(RunDelay, cancellationToken: token).SuppressCancellationThrow();
 
@@ -32,7 +32,7 @@ public abstract class ActionParameter
         }
     }
 
-    protected abstract void RunAction_Impl(BattleUnit target);
+    protected abstract void RunAction_Impl(List<WorldObject> target);
 
     public virtual void Release()
     {

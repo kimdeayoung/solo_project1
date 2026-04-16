@@ -6,7 +6,7 @@ public class MoveSpeedDown : StatusInfluence
 
     public override StatusInfluenceType InfluenceType => StatusInfluenceType.MoveSpeedDown;
 
-    public override void OnStart(BattleUnit unit, AddStatusInfluenceData data)
+    public override void OnStart(WorldObject unit, AddStatusInfluenceData data)
     {
         base.OnStart(unit, data);
 

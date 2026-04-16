@@ -11,7 +11,9 @@ public class Entitys
     private BattleUnit player;
     private Dictionary<string, List<BattleUnit>> units;
 
-    private Dictionary<StatusInfluenceType, List<StatusInfluence>> statusInfluencePool;
+    private List<SearchMethod>[] searchMethodPool;
+
+    private List<StatusInfluence>[] statusInfluencePool;
 
     private int requestInstantiateCount;
     public bool IsEmptyInstantiate => requestInstantiateCount == 0;
@@ -27,12 +29,22 @@ public class Entitys
         units = new Dictionary<string, List<BattleUnit>>(8);
 
         {
+            int searchMethodTypeCount = (int)SearchMethodType.Length;
+            searchMethodPool = new List<SearchMethod>[searchMethodTypeCount];
+
+            for (int i = 0; i < searchMethodTypeCount; i++)
+            {
+                searchMethodPool[i] = new List<SearchMethod>(32);
+            }
+        }
+
+        {
             int statusInfluenceTypeCount = (int)StatusInfluenceType.Length;
-            statusInfluencePool = new Dictionary<StatusInfluenceType, List<StatusInfluence>>(statusInfluenceTypeCount);
+            statusInfluencePool = new List<StatusInfluence>[statusInfluenceTypeCount];
 
             for (int i = 0; i < statusInfluenceTypeCount; i++)
             {
-                statusInfluencePool.Add((StatusInfluenceType)i, new List<StatusInfluence>(32));
+                statusInfluencePool[i] = new List<StatusInfluence>(32);
             }
         }
 
@@ -171,7 +183,7 @@ public class Entitys
     public StatusInfluence GetStatusInfluence(StatusInfluenceType type)
     {
         StatusInfluence statusInfluence = null;
-        statusInfluencePool.TryGetValue(type, out List<StatusInfluence> statusInfluences);
+        List<StatusInfluence> statusInfluences = statusInfluencePool[(int)type];
         int count = statusInfluences.Count;
         if (count > 0)
         {
@@ -188,7 +200,7 @@ public class Entitys
 
     public void ReleaseStatusInfluence(StatusInfluence statusInfluence)
     {
-        statusInfluencePool.TryGetValue(statusInfluence.InfluenceType, out List<StatusInfluence> statusInfluences);
+        List<StatusInfluence> statusInfluences = statusInfluencePool[(int)statusInfluence.InfluenceType];
         statusInfluences.Add(statusInfluence);
     }
 
@@ -204,6 +216,46 @@ public class Entitys
 
             case StatusInfluenceType.MoveSpeedDown:
                 return new MoveSpeedDown();
+        }
+
+        return null;
+    }
+    #endregion
+
+    #region SearchMethod
+    public SearchMethod GetSearchMethod(SearchMethodType type, SearchMethodProperty data)
+    {
+        SearchMethod searchMethod = null;
+        List<SearchMethod> searchMethods = searchMethodPool[(int)type];
+        int count = searchMethods.Count;
+        if (count > 0)
+        {
+            searchMethod = searchMethods[^1];
+            searchMethods.RemoveAt(count);
+        }
+        else
+        {
+            searchMethod = CreateSearchMethod(type);
+        }
+        searchMethod.ResetVariables(data);
+
+        return searchMethod;
+    }
+
+    public void ReleaseSearchMethod(SearchMethod searchMethod)
+    {
+        List<SearchMethod> searchMethods = searchMethodPool[(int)searchMethod.Type];
+        searchMethods.Add(searchMethod);
+    }
+
+    private SearchMethod CreateSearchMethod(SearchMethodType type)
+    {
+        switch (type)
+        {
+            case SearchMethodType.Self:
+                return new Self();
+            case SearchMethodType.ByDistance:
+                return new ByDistance();
         }
 
         return null;

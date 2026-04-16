@@ -2,12 +2,12 @@ using UnityEngine;
 
 public abstract class StatusInfluence
 {
-    protected BattleUnit owner;
+    protected WorldObject owner;
     public abstract StatusInfluenceType InfluenceType { get; }
     public AddStatusInfluenceType AddStatusInfluenceType { get; private set; }
     public float Duration { get; protected set; }
 
-    public virtual void OnStart(BattleUnit unit, AddStatusInfluenceData data)
+    public virtual void OnStart(WorldObject unit, AddStatusInfluenceData data)
     {
         owner = unit;
 

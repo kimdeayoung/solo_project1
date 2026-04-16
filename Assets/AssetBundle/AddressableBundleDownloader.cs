@@ -65,6 +65,8 @@ public class AddressableBundleDownloader : SingletonWithMono<AddressableBundleDo
     private Action downloadEndAction;
     private Action<ulong> initBundleDownloadInfosCallback;
 
+    private List<string> bundleLabels;
+
     private ulong currentDownloadSize;
     private ulong totalDownloadSize;
 
@@ -83,17 +85,19 @@ public class AddressableBundleDownloader : SingletonWithMono<AddressableBundleDo
         totalDownloadSize = 0;
         currentState = DownloaderState.None;
         initBundleDownloadInfosCallback = callback;
-        List<string> bundleLabels = AddressablePath.BundleLabels;
+        bundleLabels = AddressablePath.GetAddressableLabels();
 
         foreach (string bundleLabel in bundleLabels)
         {
             InitBundleDownloadInfo(bundleLabel);
-        }       
+        }
     }
 
     private void InitBundleDownloadInfo(string bundleLabel)
     {
         AsyncOperationHandle<long> getDownloadSize = Addressables.GetDownloadSizeAsync(bundleLabel);
+
+
         getDownloadSize.Completed += (AsyncOperationHandle<long> obj) =>
         {
             switch (obj.Status)
@@ -112,7 +116,7 @@ public class AddressableBundleDownloader : SingletonWithMono<AddressableBundleDo
             }
 
             Addressables.Release(obj);
-            if (AddressablePath.BundleLabels.Count <= ++checkDownloadSizeCount)
+            if (bundleLabels.Count <= ++checkDownloadSizeCount)
             {
                 if (downloadInfoQueue.Count > 0)
                 {
@@ -186,8 +190,6 @@ public class AddressableBundleDownloader : SingletonWithMono<AddressableBundleDo
 
     public void ClearAssetBundles()
     {
-        List<string> bundleLabels = AddressablePath.BundleLabels;
-
         foreach (string bundleLabel in bundleLabels)
         {
             Addressables.ClearDependencyCacheAsync(bundleLabel);

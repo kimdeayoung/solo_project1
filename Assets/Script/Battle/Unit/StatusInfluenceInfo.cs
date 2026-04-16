@@ -3,12 +3,12 @@ using System.Diagnostics;
 
 public class StatusInfluenceInfo
 {
-    private BattleUnit owner;
+    private WorldObject owner;
 
     private List<StatusInfluence> _statusInfluences;
     private Entitys entitys;
 
-    public StatusInfluenceInfo(BattleUnit owner)
+    public StatusInfluenceInfo(WorldObject owner)
     {
         this.owner = owner;
 

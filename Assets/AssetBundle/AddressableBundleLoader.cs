@@ -23,14 +23,9 @@ public class AddressableBundleLoader : Singleton<AddressableBundleLoader>
 {
     private Dictionary<string, AsyncOperationHandle> operationHandles;
 
-    private AtlasManagement atlasManagement;
-    public AtlasManagement AtlasManagement => atlasManagement;
-
     public void InitInstance()
     {
         operationHandles = new Dictionary<string, AsyncOperationHandle>(256);
-
-        atlasManagement = new AtlasManagement();
     }
 
     public bool IsCachedAsset(string assetName)
@@ -171,6 +166,16 @@ public class AddressableBundleLoader : Singleton<AddressableBundleLoader>
         };
     }
 
+    public T TryGetLoadedAsset<T>(string assetName) where T : UnityEngine.Object
+    {
+        if (operationHandles.TryGetValue(assetName, out AsyncOperationHandle handle))
+        {
+            return handle.Result as T;
+        }
+
+        return null;
+    }
+
     /// <summary>
     /// 에셋 로드 밑 캐싱이 완료된 경우에만 동기 생성
     /// </summary>
@@ -217,11 +222,6 @@ public class AddressableBundleLoader : Singleton<AddressableBundleLoader>
                 }
             };
         }
-    }
-
-    public void LoadSpriteAtlasAsync(string atlasName, Action<string> onFinished = null)
-    {
-        atlasManagement.LoadSpriteAtlasAsync(atlasName, onFinished);
     }
 
     public void DestroyInstantiateObj(GameObject obj)
@@ -281,6 +281,5 @@ public class AddressableBundleLoader : Singleton<AddressableBundleLoader>
     public void ClearData()
     {
         ReleaseAllAssets();
-        atlasManagement.ClearData();
     }
 }

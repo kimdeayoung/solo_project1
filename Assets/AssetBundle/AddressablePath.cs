@@ -1,9 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Xml;
-using System.Xml.Linq;
 #if UNITY_EDITOR
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
@@ -21,28 +18,6 @@ public static class AddressablePath
 
     private static List<string> bundleLabels = new List<string>();
     private static AddressableAssetGroupInfo assetGroupInfo = new AddressableAssetGroupInfo();
-
-    public static List<string> BundleLabels
-    {
-        get
-        {
-            bundleLabels = new List<string>
-                {
-                    //"default",
-                    "Prefab",
-                    //"Sound", 
-                    "Tables",
-                    //"Effects",
-                    //"SkillEffectData",
-                    "Atlases",
-                    "Spine",
-                    "Sprites",
-                    "RawSprites",
-                };
-
-            return bundleLabels;
-        }
-    }
 
     public static AddressableAssetGroupInfo AssetGroupInfo { get => assetGroupInfo; }
 

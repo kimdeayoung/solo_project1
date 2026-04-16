@@ -14,6 +14,8 @@ public enum SearchMethodType
 {
     Self,
     ByDistance,
+    InRange,
+    Length,
 }
 
 public enum ObjectType
