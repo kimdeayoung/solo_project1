@@ -30,7 +30,7 @@ public class ActionBtn : MonoBehaviour
 
     public void OnClickBtn()
     {
-        if (actionData.IsExecuteAble())
+        if (actionData.IsExecuteAble() && actionData.SearchActionTarget())
         {
             actionData.Execute().Forget();
         }

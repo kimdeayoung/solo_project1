@@ -22,10 +22,15 @@ namespace EnemyState
 
         public override void OnUpdate(float deltaTime)
         {
+            Vector3 targetDir = (enemy.Target.transform.position - enemy.transform.position).normalized;
+            ownerBase.SetMoveDirection(targetDir, 1.0f);
+
+            ownerBase.UpdateActionDatas(deltaTime);
         }
 
         public override void OnFixedUpdate(float fixedDeltaTime)
         {
+            ownerBase.TranslateWithRotation(fixedDeltaTime);
         }
 
         public override void OnEnd()

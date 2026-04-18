@@ -10,6 +10,9 @@ public abstract class BattleUnit : WorldObject
 
     public IBehaviourController BehaviourController { get; private set; }
 
+    private Vector3 moveDirection;
+    private float moveIntensity;
+
     [SerializeField] protected Animator animator;
     [SerializeField] protected Rigidbody rigidBody;
 
@@ -44,8 +47,30 @@ public abstract class BattleUnit : WorldObject
         ActionResource -= data.actionResource;
     }
 
-    public virtual void SetMoveDirection(Vector3 direction, float intensity)
+    public void SetMoveDirection(Vector3 direction, float intensity)
     {
+        moveDirection = direction;
+        moveIntensity = Mathf.Clamp01(intensity);
+    }
+
+    public void TranslateWithRotation(float fixedDeltaTime)
+    {
+        if (moveIntensity <= float.Epsilon)
+        {
+            return;
+        }
+
+        Quaternion targetRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
+        Quaternion newRotation = Quaternion.RotateTowards(rigidBody.rotation, targetRotation, Status.StatusAttributes.RotateSpeed * fixedDeltaTime);
+
+        rigidBody.MoveRotation(newRotation);
+
+        Vector3 forward = rigidBody.transform.forward;
+        forward.y = 0f;
+        forward.Normalize();
+
+        Vector3 move = forward * Status.StatusAttributes.MoveSpeed * moveIntensity * fixedDeltaTime;
+        rigidBody.MovePosition(rigidBody.position + move);
     }
 
     public virtual void UpdateActionDatas(float deltaTime)

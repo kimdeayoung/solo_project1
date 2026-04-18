@@ -7,6 +7,7 @@ public class Battle : SceneInstance
     public Entitys Entity { get; private set; }
     public Transform EntityRoot { get; private set; }
 
+    public EnemySpawner EnemySpawner { get; private set; }
     public BattleUIController BattleUIController { get; private set; }
 
     public override void PreLoad()
@@ -17,6 +18,9 @@ public class Battle : SceneInstance
 
         EntityRoot = transform.Find("BattleObjects");
         Entity = new Entitys();
+
+        EnemySpawner = new EnemySpawner();
+        EnemySpawner.Init();
 
         loadProcess = new BattleLoadProcess(OnAssetLoadEnd);
         loadProcess.LoadAssets().Forget();
@@ -41,6 +45,7 @@ public class Battle : SceneInstance
             Debug.Assert(player != null);
 
             hud.RegisterPlayer(player);
+            EnemySpawner.RegisterPlayer(player);
 
             GlobalVariables globalVariables = GameManager.Instance.GlobalVariables;
 
@@ -55,6 +60,7 @@ public class Battle : SceneInstance
         float deltaTime = Time.deltaTime * TimeManager.Instance.GameSpeed;
 
         Entity.OnUpdate(deltaTime);
+        EnemySpawner.OnUpdate(deltaTime);
     }
 
     protected override void FixedUpdate()

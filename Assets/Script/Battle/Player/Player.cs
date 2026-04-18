@@ -9,9 +9,6 @@ public class Player : BattleUnit
 
     public override BattleUnitType Type =>  BattleUnitType.Player;
 
-    private Vector3 moveDirection;
-    private float moveIntensity;
-
     private List<BaseActionData> _actionDatas;
     public IReadOnlyList<BaseActionData> ActionDatas => _actionDatas;
 
@@ -59,32 +56,5 @@ public class Player : BattleUnit
         {
             _actionDatas[i].OnUpdate(deltaTime, Status.GetHaste());
         }
-    }
-
-    public override void SetMoveDirection(Vector3 direction, float intensity)
-    {
-        base.SetMoveDirection(direction, intensity);
-        moveDirection = direction;
-        moveIntensity = intensity;
-    }
-
-    public void TranslateWithRotation(float fixedDeltaTime)
-    {
-        if (moveIntensity <= float.Epsilon)
-        {
-            return;
-        }
-
-        Quaternion targetRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
-        Quaternion newRotation = Quaternion.RotateTowards(rigidBody.rotation, targetRotation, _stat.Rotate * fixedDeltaTime);
-
-        rigidBody.MoveRotation(newRotation);
-
-        Vector3 forward = rigidBody.transform.forward;
-        forward.y = 0f;
-        forward.Normalize();
-
-        Vector3 move = forward * Status.StatusAttributes.MoveSpeed * moveIntensity * fixedDeltaTime;
-        rigidBody.MovePosition(rigidBody.position + move);
     }
 }

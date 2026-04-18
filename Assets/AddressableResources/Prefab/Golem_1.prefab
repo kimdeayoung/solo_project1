@@ -46,6 +46,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3dd9352ef9984e4b965d3bf127e1815, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
+  animator: {fileID: 6212571740715009484}
+  rigidBody: {fileID: 1121108514213279773}
+  _stat: {fileID: 11400000, guid: a06687cb167329e4b800122a04be8625, type: 2}
 --- !u!54 &1121108514213279773
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -133,5 +136,10 @@ PrefabInstance:
 --- !u!4 &60607012174503862 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1101820335844390578, guid: b6bccdacfb5bb1c429aeb099420931cb, type: 3}
+  m_PrefabInstance: {fileID: 1125092866847238404}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &6212571740715009484 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 6461081161248779464, guid: b6bccdacfb5bb1c429aeb099420931cb, type: 3}
   m_PrefabInstance: {fileID: 1125092866847238404}
   m_PrefabAsset: {fileID: 0}

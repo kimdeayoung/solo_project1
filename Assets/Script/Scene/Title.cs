@@ -14,6 +14,7 @@ public class Title : SceneInstance
         base.OnStart();
 
         PlayData.InsertAdvanceData(new CreateInAdvanceData("Player", 1, ObjectType.BattleUnit));
+        PlayData.InsertAdvanceData(new CreateInAdvanceData("Golem_1", 32, ObjectType.BattleUnit));
 
         SceneManager.LoadScene("Battle");
     }

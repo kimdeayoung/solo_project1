@@ -9,6 +9,7 @@ public class Entitys
     private List<BattleUnit> activeBattleUnits;
 
     private BattleUnit player;
+    public BattleUnit Player => player;
     private Dictionary<string, List<BattleUnit>> units;
 
     private List<SearchMethod>[] searchMethodPool;
@@ -63,8 +64,11 @@ public class Entitys
             switch (data.objectType)
             {
                 case ObjectType.BattleUnit:
-                    ++requestInstantiateCount;
-                    loader.InstantiateAsync(data.assetName, battleScene.EntityRoot, OnCreateBattleUnit);
+                    for (int j = 0; j < data.createCount; j++)
+                    {
+                        ++requestInstantiateCount;
+                        loader.InstantiateAsync(data.assetName, battleScene.EntityRoot, OnCreateBattleUnit);
+                    }
                     break;
             }
         }

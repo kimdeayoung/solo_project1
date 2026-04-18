@@ -12,6 +12,9 @@ public abstract class BaseActionDataSO : ScriptableObject
     [SerializeField] private SearchMethodProperty searchMethod;
     public SearchMethodProperty SearchMethod => searchMethod;
 
+    [SerializeField] private bool searchIgnoreCaster;
+    public bool SearchIgnoreCaster => searchIgnoreCaster;
+
     [SerializeField] private float coolTime;
     public float CoolTime => coolTime;
 

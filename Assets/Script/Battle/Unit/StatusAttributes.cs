@@ -15,6 +15,9 @@ public class StatusAttributes
     private ClampValuePair<float, float> moveSpeed;
     public float MoveSpeed => moveSpeed.ClampValue;
 
+    private ClampValuePair<float, float> rotateSpeed;
+    public float RotateSpeed => rotateSpeed.ClampValue;
+
     public ClampValuePair<float, float> haste;
     public float Haste => haste.ClampValue;
 
@@ -25,6 +28,7 @@ public class StatusAttributes
         Def = stat.Def;
 
         moveSpeed = new ClampValuePair<float, float>(stat.MoveSpeed, stat.MoveSpeed);
+        rotateSpeed = new ClampValuePair<float, float>(stat.Rotate, stat.Rotate);
         haste = new ClampValuePair<float, float>();
         StunCount = 0;
     }

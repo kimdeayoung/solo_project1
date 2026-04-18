@@ -27,17 +27,11 @@ namespace PlayerState
 
         public override void OnFixedUpdate(float fixedDeltaTime)
         {
-            UpdateMove(fixedDeltaTime);
+            ownerBase.TranslateWithRotation(fixedDeltaTime);
         }
 
         public override void OnEnd()
         {
-
-        }
-
-        private void UpdateMove(float fixedDeltaTime)
-        {
-            player.TranslateWithRotation(fixedDeltaTime);
         }
     }
 }

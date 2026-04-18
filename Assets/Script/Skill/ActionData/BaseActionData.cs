@@ -2,7 +2,7 @@ using Cysharp.Threading.Tasks;
 using System.Threading;
 using System.Diagnostics;
 using System.Collections.Generic;
-using Unity.VisualScripting;
+using UnityEngine.Pool;
 
 public readonly struct ActionResourceData
 {
@@ -29,7 +29,7 @@ public abstract class BaseActionData
 
     private SearchMethod searchMethod;
     private List<WorldObject> searchResult;
-    private HashSet<int> searchIngoreTarget;
+    private bool searchIgnoreCaster;
 
     private float coolTime;
     public float CooltimeRatio => coolTime / resourceData.coolTime;
@@ -51,6 +51,7 @@ public abstract class BaseActionData
         resourceData = new ActionResourceData(data);
 
         searchMethod = entitys.GetSearchMethod(data.SearchMethodType, data.SearchMethod);
+        searchIgnoreCaster = data.SearchIgnoreCaster;
 
         coolTime = resourceData.coolTime;
         isUpdateAble = true;
@@ -60,7 +61,6 @@ public abstract class BaseActionData
         IconName = data.IconName;
 
         searchResult = new List<WorldObject>();
-        searchIngoreTarget = new HashSet<int>();
         if (cancelToken == null)
         {
             cancelToken = new CancellationTokenSource();
@@ -93,18 +93,57 @@ public abstract class BaseActionData
         coolTime -= deltaTime * speedMultiplier;
     }
 
+    public bool SearchActionTarget()
+    {
+        searchResult.Clear();
+
+        if (searchIgnoreCaster)
+        {
+            using var _ = HashSetPool<int>.Get(out HashSet<int> searchIngoreTarget);
+            searchIngoreTarget.Add(owner.GetInstanceID());
+            searchMethod.Run(owner, searchIngoreTarget, searchResult);
+        }
+        else
+        {
+            searchMethod.Run(owner, null, searchResult);
+        }
+        return searchResult.Count > 0;
+    }
+
+    public bool SearchActionTarget(WorldObject caster, HashSet<int> searchIngoreTarget)
+    {
+        Debug.Assert(caster != null);
+        Debug.Assert(searchIngoreTarget != null);
+        searchResult.Clear();
+
+        if (searchIgnoreCaster)
+        {
+            searchIngoreTarget.Add(caster.GetInstanceID());
+        }
+
+        searchMethod.Run(caster, searchIngoreTarget, searchResult);
+        return searchResult.Count > 0;
+    }
+
+    public bool SearchActionTarget(SearchMethod customeSearchMethod, WorldObject caster, HashSet<int> searchIngoreTarget)
+    {
+        Debug.Assert(caster != null);
+        Debug.Assert(searchIngoreTarget != null);
+        searchResult.Clear();
+
+        if (searchIgnoreCaster)
+        {
+            searchIngoreTarget.Add(caster.GetInstanceID());
+        }
+
+        customeSearchMethod.Run(caster, searchIngoreTarget, searchResult);
+        return searchResult.Count > 0;
+    }
+
     public async UniTask Execute()
     {
         Debug.Assert(IsExecuteAble());
-
-        searchIngoreTarget.Add(owner.GetInstanceID());
-        searchMethod.Run(owner, searchIngoreTarget, searchResult);
-        if (searchResult.Count == 0)
-        {
-            searchIngoreTarget.Clear();
-            searchResult.Clear();
-            return;
-        }
+        Debug.Assert(searchResult.Count > 0);
 
         isUpdateAble = false;
         Debug.Assert(owner.HasEnoughActionResource(resourceData));
@@ -126,7 +165,6 @@ public abstract class BaseActionData
         coolTime = resourceData.coolTime;
         isUpdateAble = true;
 
-        searchIngoreTarget.Clear();
         searchResult.Clear();
     }
 
@@ -150,7 +188,6 @@ public abstract class BaseActionData
 
         entitys.ReleaseSearchMethod(searchMethod);
 
-        searchIngoreTarget.Clear();
         searchResult.Clear();
     }
 }
