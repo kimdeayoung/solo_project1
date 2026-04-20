@@ -2,12 +2,16 @@ using PlayerState;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class Player : BattleUnit
 {
     [SerializeField] private PlayerStatusStat _stat;
 
-    public override BattleUnitType Type =>  BattleUnitType.Player;
+    public override BattleUnitType Type => BattleUnitType.Player;
+
+    private Vector3 moveDirection;
+    private float moveIntensity;
 
     private List<BaseActionData> _actionDatas;
     public IReadOnlyList<BaseActionData> ActionDatas => _actionDatas;
@@ -56,5 +60,31 @@ public class Player : BattleUnit
         {
             _actionDatas[i].OnUpdate(deltaTime, Status.GetHaste());
         }
+    }
+
+    public void SetMoveDirection(Vector3 direction, float intensity)
+    {
+        moveDirection = direction;
+        moveIntensity = Mathf.Clamp01(intensity);
+    }
+
+    public void MoveWithRotation(float fixedDeltaTime)
+    {
+        if (moveIntensity <= float.Epsilon)
+        {
+            return;
+        }
+
+        Quaternion targetRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
+        Quaternion newRotation = Quaternion.RotateTowards(rigidBody.rotation, targetRotation, Status.StatusAttributes.RotateSpeed * fixedDeltaTime);
+
+        rigidBody.MoveRotation(newRotation);
+
+        Vector3 forward = newRotation * Vector3.forward;
+        forward.y = 0f;
+        forward.Normalize();
+
+        Vector3 moveStep = forward * Status.StatusAttributes.MoveSpeed * moveIntensity * fixedDeltaTime;
+        rigidBody.MovePosition(rigidBody.position + moveStep);
     }
 }

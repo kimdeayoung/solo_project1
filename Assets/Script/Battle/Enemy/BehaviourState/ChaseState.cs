@@ -22,15 +22,12 @@ namespace EnemyState
 
         public override void OnUpdate(float deltaTime)
         {
-            Vector3 targetDir = (enemy.Target.transform.position - enemy.transform.position).normalized;
-            ownerBase.SetMoveDirection(targetDir, 1.0f);
-
             ownerBase.UpdateActionDatas(deltaTime);
         }
 
         public override void OnFixedUpdate(float fixedDeltaTime)
         {
-            ownerBase.TranslateWithRotation(fixedDeltaTime);
+            //TODO: 이동 로직 Nav Mesh 사용으로 변경
         }
 
         public override void OnEnd()

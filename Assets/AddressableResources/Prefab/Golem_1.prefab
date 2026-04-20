@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 4232452500990037926}
   - component: {fileID: 2492898097911481546}
   - component: {fileID: 1121108514213279773}
+  - component: {fileID: 1675591878960309993}
+  - component: {fileID: 5953857891077643279}
   m_Layer: 0
   m_Name: Golem_1
   m_TagString: Untagged
@@ -49,6 +51,7 @@ MonoBehaviour:
   animator: {fileID: 6212571740715009484}
   rigidBody: {fileID: 1121108514213279773}
   _stat: {fileID: 11400000, guid: a06687cb167329e4b800122a04be8625, type: 2}
+  sweepTestArea: 2
 --- !u!54 &1121108514213279773
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -61,7 +64,7 @@ Rigidbody:
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaTensor: {x: 1, y: 0, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
   m_IncludeLayers:
     serializedVersion: 2
@@ -72,10 +75,44 @@ Rigidbody:
   m_ImplicitCom: 0
   m_ImplicitTensor: 0
   m_UseGravity: 0
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 84
   m_CollisionDetection: 0
+--- !u!65 &1675591878960309993
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6421626156352216579}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.22, y: 1.8, z: 1}
+  m_Center: {x: 0, y: 1.09, z: 0}
+--- !u!114 &5953857891077643279
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6421626156352216579}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a898e7ad202bbb541b9c7334722d04af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DetectableComponent
+  worldObject: {fileID: 2492898097911481546}
 --- !u!1001 &1125092866847238404
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -126,6 +163,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1101820335844390578, guid: b6bccdacfb5bb1c429aeb099420931cb, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6461081161248779464, guid: b6bccdacfb5bb1c429aeb099420931cb, type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
