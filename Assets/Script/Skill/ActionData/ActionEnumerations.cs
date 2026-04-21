@@ -17,5 +17,6 @@ public enum ActionParameterType
 {
     Projectile,
     ApplyStatusInfluence,
+    MeleeHit,
     Length,
 }

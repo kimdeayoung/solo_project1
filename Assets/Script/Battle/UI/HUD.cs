@@ -29,7 +29,7 @@ public class HUD : UIBase
         {
             if (actionCount > i)
             {
-                actionBtns[i].Init(baseActions[i]);
+                actionBtns[i].Init(player, baseActions[i]);
                 actionBtns[i].gameObject.SetActive(true);
             }
             else

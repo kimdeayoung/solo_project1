@@ -9,6 +9,7 @@ public class EnemySpawner
     public void Init()
     {
         entitys = GameManager.Instance.SceneInstance<Battle>().Entity;
+        term = 2.0f;
     }
 
     public void RegisterPlayer(Player player)

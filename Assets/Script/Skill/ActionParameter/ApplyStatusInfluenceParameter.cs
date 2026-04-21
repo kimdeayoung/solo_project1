@@ -13,12 +13,12 @@ public class ApplyStatusInfluenceParameter : ActionParameter
         addStatusInfluenceData = new AddStatusInfluenceData(applyStatusInfluence);
     }
 
-    protected override void RunAction_Impl(List<WorldObject> target)
+    protected override void RunAction_Impl(WorldObject caster, List<WorldObject> targets)
     {
-        int loopCount = target.Count;
+        int loopCount = targets.Count;
         for (int i = 0; i < loopCount; i++)
         {
-            target[i].Status.ApplyStatusInfluence(addStatusInfluenceData);
+            targets[i].Status.ApplyStatusInfluence(addStatusInfluenceData);
         }
     }
 }

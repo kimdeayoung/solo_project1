@@ -23,7 +23,7 @@ public class DefaultActionData : BaseActionData
         }
     }
 
-    protected override float RunActions(List<WorldObject> searchResult)
+    protected override float RunActions(WorldObject caster, List<WorldObject> searchResult)
     {
         float duration = 0.0f;
         int actionParameterCount = _actionParameters.Count;
@@ -41,14 +41,14 @@ public class DefaultActionData : BaseActionData
                 animationName = actionParameter.AnimationName;
             }
 
-            actionParameter.RunAction(searchResult, token);
+            actionParameter.RunAction(caster, searchResult, token);
         }
         owner.RunAnimation(animationName);
 
         return duration;
     }
 
-    public override void Release()
+    protected override void Release()
     {
         base.Release();
 

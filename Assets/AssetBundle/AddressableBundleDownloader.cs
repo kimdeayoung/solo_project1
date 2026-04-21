@@ -85,7 +85,7 @@ public class AddressableBundleDownloader : SingletonWithMono<AddressableBundleDo
         totalDownloadSize = 0;
         currentState = DownloaderState.None;
         initBundleDownloadInfosCallback = callback;
-        bundleLabels = AddressablePath.GetAddressableLabels();
+        //bundleLabels = AddressablePath.GetAddressableLabels();
 
         foreach (string bundleLabel in bundleLabels)
         {

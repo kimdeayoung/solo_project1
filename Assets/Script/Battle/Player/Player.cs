@@ -1,8 +1,11 @@
+using Cysharp.Threading.Tasks;
 using PlayerState;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using static UnityEngine.GraphicsBuffer;
 
 public class Player : BattleUnit
 {
@@ -16,6 +19,10 @@ public class Player : BattleUnit
     private List<BaseActionData> _actionDatas;
     public IReadOnlyList<BaseActionData> ActionDatas => _actionDatas;
 
+    private List<BaseActionData> _collisionActions;
+
+    private Action<BaseActionData> onActionEnd;
+
     public override void Init(string assetName)
     {
         base.Init(assetName);
@@ -25,6 +32,7 @@ public class Player : BattleUnit
         BehaviourController.SetBehaviourState(UnitState.Idle);
 
         Status = new PlayerStatus(this, _stat);
+        onActionEnd = OnActionEnd;
     }
 
     public override void OnStart()
@@ -38,7 +46,20 @@ public class Player : BattleUnit
             for (int i = 0; i < actionDataCount; i++)
             {
                 BaseActionData actionData = ActionDataPool.GetActionData(this, actionDatas[i]);
+                actionData.IncreaseRefCount();
                 _actionDatas.Add(actionData);
+            }
+        }
+
+        {
+            BaseActionDataSO[] collisionActions = _stat.CollisionActions;
+            int collisionActionsCount = collisionActions.Length;
+            _collisionActions = new List<BaseActionData>(collisionActionsCount);
+            for (int i = 0; i < collisionActionsCount; i++)
+            {
+                BaseActionData actionData = ActionDataPool.GetActionData(this, collisionActions[i]);
+                actionData.IncreaseRefCount();
+                _collisionActions.Add(actionData);
             }
         }
     }
@@ -51,6 +72,19 @@ public class Player : BattleUnit
     public override void OnFixedUpdate(float fixedDeltaTime)
     {
         BehaviourController.OnFixedUpdate(fixedDeltaTime);
+    }
+
+    private void OnTriggerEnter(Collider collision)
+    {
+        WorldObject target = collision.gameObject.GetComponent<DetectableComponent>().WorldObject;
+        HitParameter hitParameter = new HitParameter(Status.StatusAttributes, 1.0f);
+        target.OnHit(hitParameter);
+
+        int loopCount = _collisionActions.Count;
+        for (int i = 0; i < loopCount; i++)
+        {
+            TryExecuteAction(_collisionActions[i]);
+        }
     }
 
     public override void UpdateActionDatas(float deltaTime)
@@ -86,5 +120,42 @@ public class Player : BattleUnit
 
         Vector3 moveStep = forward * Status.StatusAttributes.MoveSpeed * moveIntensity * fixedDeltaTime;
         rigidBody.MovePosition(rigidBody.position + moveStep);
+    }
+
+    public override bool TryExecuteAction(BaseActionData actionData)
+    {
+        if (actionData.IsExecuteAble())
+        {
+            if (actionData.IsSelfExecuted)
+            {
+                if (actionData.SearchActionTarget())
+                {
+                    actionData.IncreaseRefCount();
+                    actionData.Execute(this, onActionEnd).Forget();
+                    return true;
+                }
+            }
+            else
+            {
+                Entitys entity = GameManager.Instance.SceneInstance<Battle>().Entity;
+                ActionObject actionObject = entity.GetActionObect(this, actionData);
+                actionObject.Run();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void OnActionEnd(BaseActionData actionData)
+    {
+        BaseActionDataSO afterActionSO = actionData.AfterActionSO;
+        if (afterActionSO != null)
+        {
+            BaseActionData afterAction = ActionDataPool.GetActionData(this, afterActionSO);
+            if (!TryExecuteAction(afterAction))
+            {
+                afterAction.DecreaseRefCount();
+            }
+        }
     }
 }

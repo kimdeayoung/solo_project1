@@ -5,7 +5,7 @@ public class ProjectileParameter : ActionParameter
 {
     public override ActionParameterType ActionParameterType => ActionParameterType.Projectile;
 
-    protected override void RunAction_Impl(List<WorldObject> target)
+    protected override void RunAction_Impl(WorldObject caster, List<WorldObject> targets)
     {
     }
 }

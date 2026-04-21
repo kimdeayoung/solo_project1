@@ -17,6 +17,9 @@ public abstract class UnitStat : ScriptableObject
     [SerializeField] private float _rotate;
     public float Rotate => _rotate;
 
+    [SerializeField] private int _weight;
+    public int Weight => _weight;
+
     [SerializeField] private BaseActionDataSO[] _collisionActions = System.Array.Empty<BaseActionDataSO>();
     public BaseActionDataSO[] CollisionActions => _collisionActions;
 

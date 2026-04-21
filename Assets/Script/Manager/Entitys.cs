@@ -16,6 +16,8 @@ public class Entitys
 
     private List<StatusInfluence>[] statusInfluencePool;
 
+    private List<ActionObject> actionObjects;
+
     private int requestInstantiateCount;
     public bool IsEmptyInstantiate => requestInstantiateCount == 0;
 
@@ -28,6 +30,8 @@ public class Entitys
 
         activeBattleUnits = new List<BattleUnit>(512);
         units = new Dictionary<string, List<BattleUnit>>(8);
+
+        actionObjects = new List<ActionObject>(64);
 
         {
             int searchMethodTypeCount = (int)SearchMethodType.Length;
@@ -70,6 +74,14 @@ public class Entitys
                         loader.InstantiateAsync(data.assetName, battleScene.EntityRoot, OnCreateBattleUnit);
                     }
                     break;
+
+                case ObjectType.ActionObject:
+                    for (int j = 0; ++j < data.createCount; j++)
+                    {
+                        ++requestInstantiateCount;
+                        loader.InstantiateAsync(data.assetName, battleScene.EntityRoot, OnCreateActionObject);
+                    }
+                    break;
             }
         }
 
@@ -86,7 +98,11 @@ public class Entitys
         int loopCount = activeBattleUnits.Count;
         for (int i = 0; i < loopCount; i++)
         {
-            activeBattleUnits[i].OnUpdate(deltaTime);
+            BattleUnit battleUnit = activeBattleUnits[i];
+            if (battleUnit.IsAlive())
+            {
+                battleUnit.OnUpdate(deltaTime);
+            }
         }
     }
 
@@ -95,7 +111,11 @@ public class Entitys
         int loopCount = activeBattleUnits.Count;
         for (int i = 0; i < loopCount; i++)
         {
-            activeBattleUnits[i].OnFixedUpdate(fixedDeltaTime);
+            BattleUnit battleUnit = activeBattleUnits[i];
+            if (battleUnit.IsAlive())
+            {
+                battleUnit.OnFixedUpdate(fixedDeltaTime);
+            }
         }
     }
 
@@ -158,6 +178,14 @@ public class Entitys
         --requestInstantiateCount;
     }
 
+    private void OnCreateActionObject(string key, GameObject obj)
+    {
+        ActionObject actionobject = obj.GetComponent<ActionObject>();
+        actionObjects.Add(actionobject);
+
+        --requestInstantiateCount;
+    }
+
     public BattleUnit FindBattleUnitOrNull(BattleUnitType type)
     {
         switch (type)
@@ -192,7 +220,7 @@ public class Entitys
         if (count > 0)
         {
             statusInfluence = statusInfluences[^1];
-            statusInfluences.RemoveAt(count);
+            statusInfluences.RemoveAt(count - 1);
         }
         else
         {
@@ -235,7 +263,7 @@ public class Entitys
         if (count > 0)
         {
             searchMethod = searchMethods[^1];
-            searchMethods.RemoveAt(count);
+            searchMethods.RemoveAt(count - 1);
         }
         else
         {
@@ -260,9 +288,38 @@ public class Entitys
                 return new Self();
             case SearchMethodType.ByDistance:
                 return new ByDistance();
+            case SearchMethodType.InRange:
+                return new InRange();
         }
 
         return null;
+    }
+    #endregion
+
+    #region ActionObject
+    public ActionObject GetActionObect(BattleUnit owner, BaseActionData baseActionData)
+    {
+        ActionObject actionObject = null;
+        int count = actionObjects.Count;
+        if (count > 0)
+        {
+            actionObject = actionObjects[^1];
+            actionObjects.RemoveAt(count - 1);
+        }
+        else
+        {
+            actionObject = new ActionObject();
+            actionObject.Init();
+        }
+        actionObject.ResetVariables(owner, baseActionData);
+
+        return actionObject;
+    }
+
+    public void ReleaseActionObject(ActionObject actionObject)
+    {
+        actionObject.Release();
+        actionObjects.Add(actionObject);
     }
     #endregion
 }

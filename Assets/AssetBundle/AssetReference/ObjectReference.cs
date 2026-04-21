@@ -1,7 +1,8 @@
-using AutoGroupGenerator;
 using System;
+#if UNITY_EDITOR
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
+#endif
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 

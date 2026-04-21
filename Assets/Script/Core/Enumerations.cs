@@ -22,6 +22,7 @@ public enum ObjectType
 {
     BattleUnit,
     Projectile,
+    ActionObject,
     Length,
 }
 

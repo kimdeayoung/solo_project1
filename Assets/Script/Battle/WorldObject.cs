@@ -8,4 +8,13 @@ public abstract class WorldObject : MonoBehaviour
     {
         return Status.IsAlive();
     }
+
+    public virtual void OnHit(in HitParameter hitParameter)
+    {
+    }
+
+    public virtual bool TryExecuteAction(BaseActionData actionData)
+    {
+        return false;
+    }
 }

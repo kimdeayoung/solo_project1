@@ -32,6 +32,11 @@ public class BehaviourController : IBehaviourController
     {
         if (CurrentState != null)
         {
+            if (CurrentState.UnitState == state)
+            {
+                return;
+            }
+
             CurrentState.OnEnd();
         }
 

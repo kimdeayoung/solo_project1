@@ -27,6 +27,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - IngamePrefab
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bc6bf28e0bdc6ac4882d35660ae3fe9f
+    m_Address: ActionObject
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - IngamePrefab
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: f1f199a5155ddde49a6bf9d21abb0a62
     m_Address: HUD
     m_ReadOnly: 0

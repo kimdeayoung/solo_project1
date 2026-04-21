@@ -1,15 +1,32 @@
 using Cysharp.Threading.Tasks;
 using EnemyState;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
+
+public readonly struct NavMeshAgentProperty
+{
+    public readonly float speed;
+    public readonly float rotateSpeed;
+
+    public NavMeshAgentProperty(float speed, float rotateSpeed)
+    {
+        this.speed = speed;
+        this.rotateSpeed = rotateSpeed;
+    }
+}
 
 public class Enemy : BattleUnit
 {
     [SerializeField] private EnemyStatusStat _stat;
+    [SerializeField] private NavMeshAgent _agent;
 
     public WorldObject Target { get; private set; }
     private List<BaseActionData> _actionDatas;
     public IReadOnlyList<BaseActionData> ActionDatas => _actionDatas;
+
+    private Action<BaseActionData> onActionEnd;
 
     public override void Init(string assetName)
     {
@@ -20,6 +37,7 @@ public class Enemy : BattleUnit
         BehaviourController.SetBehaviourState(UnitState.Chase);
 
         Status = new EnemyStatus(this, _stat);
+        onActionEnd = OnActionEnd;
     }
 
     public override void OnStart()
@@ -37,6 +55,11 @@ public class Enemy : BattleUnit
                 _actionDatas.Add(actionData);
             }
         }
+
+        ResetAgentProperty(new NavMeshAgentProperty(Status.StatusAttributes.MoveSpeed, 
+                                                    Status.StatusAttributes.RotateSpeed));
+
+        //_agent.SetDestination(Target.transform.position);
     }
 
     public override BattleUnitType Type => BattleUnitType.Enemy;
@@ -44,6 +67,8 @@ public class Enemy : BattleUnit
     public override void OnUpdate(float deltaTime)
     {
         BehaviourController.OnUpdate(deltaTime);
+
+        //_agent.SetDestination(Target.transform.position);
     }
 
     public override void OnFixedUpdate(float fixedDeltaTime)
@@ -61,13 +86,64 @@ public class Enemy : BattleUnit
 
         for (int i = 0; i < loopCount; i++)
         {
-            BaseActionData actionData = _actionDatas[i];
-            if (actionData.IsExecuteAble() && actionData.SearchActionTarget())
+            if (TryExecuteAction(_actionDatas[i]))
             {
-                BehaviourController.SetBehaviourState(UnitState.Action);
-                actionData.Execute().Forget();
                 break;
             }
         }
+    }
+
+    public override bool TryExecuteAction(BaseActionData actionData)
+    {
+        if (actionData.IsExecuteAble())
+        {
+            if (actionData.IsSelfExecuted)
+            {
+                if (actionData.SearchActionTarget())
+                {
+                    BehaviourController.SetBehaviourState(UnitState.Action);
+                    actionData.Execute(this, onActionEnd).Forget();
+                    return true;
+                }
+            }
+            else
+            {
+                Entitys entity = GameManager.Instance.SceneInstance<Battle>().Entity;
+                ActionObject actionObject = entity.GetActionObect(this, actionData);
+                actionObject.Run();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void OnActionEnd(BaseActionData actionData)
+    {
+        BaseActionDataSO afterActionSO = actionData.AfterActionSO;
+        if (afterActionSO == null)
+        {
+            BehaviourController.SetBehaviourState(UnitState.Chase);
+        }
+        else
+        {
+            BaseActionData afterAction = ActionDataPool.GetActionData(this, afterActionSO);
+            if (!TryExecuteAction(afterAction))
+            {
+                afterAction.DecreaseRefCount();
+            }
+        }
+    }
+
+    public void ResetAgentProperty(NavMeshAgentProperty property)
+    {
+        _agent.speed = property.speed;
+        _agent.angularSpeed = property.rotateSpeed;
+    }
+
+    public override void OnHit(in HitParameter hitParameter)
+    {
+        base.OnHit(hitParameter);
+
+        Debug.Log("On Hit Enemy");
     }
 }

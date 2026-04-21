@@ -22,7 +22,7 @@ public abstract class ActionParameter
         AnimationName = data.AnimationName;
     }
 
-    public async void RunAction(List<WorldObject> target, CancellationToken token)
+    public async void RunAction(WorldObject caster, List<WorldObject> target, CancellationToken token)
     {
         if (RunDelay > 0)
         {
@@ -30,16 +30,16 @@ public abstract class ActionParameter
 
             if (!isCanceled)
             {
-                RunAction_Impl(target);
+                RunAction_Impl(caster, target);
             }
         }
         else
         {
-            RunAction_Impl(target);
+            RunAction_Impl(caster, target);
         }
     }
 
-    protected abstract void RunAction_Impl(List<WorldObject> target);
+    protected abstract void RunAction_Impl(WorldObject caster, List<WorldObject> targets);
 
     public virtual void Release()
     {
@@ -91,6 +91,9 @@ public static class ActionParameterPool
 
             case ActionParameterType.ApplyStatusInfluence:
                 return new ApplyStatusInfluenceParameter();
+
+            case ActionParameterType.MeleeHit:
+                return new MeleeHitParameter();
         }
 
         return null;

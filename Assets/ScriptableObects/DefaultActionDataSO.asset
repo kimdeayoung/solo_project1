@@ -12,12 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5048f532da6623e469a9c2f69ee8c35a, type: 3}
   m_Name: DefaultActionDataSO
   m_EditorClassIdentifier: Assembly-CSharp::DefaultActionDataSO
+  isSelfExecuted: 1
   searchMethodType: 0
   searchMethod:
     range: 0
     layer:
       serializedVersion: 2
       m_Bits: 0
+  searchIgnoreCaster: 0
   coolTime: 0
   actionResourceType: 0
   actionResource: 0

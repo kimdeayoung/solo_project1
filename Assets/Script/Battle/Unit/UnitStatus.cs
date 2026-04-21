@@ -40,7 +40,7 @@ public abstract class UnitStatus
         influenceInfo.ApplyStatusInfluence(data);
     }
 
-    public void ChangeMoveSpeed(float value)
+    public virtual void ChangeMoveSpeed(float value)
     {
         statusAttributes.ChangeMoveSpeed(value);
     }

@@ -3,6 +3,7 @@ using System.Threading;
 using System.Diagnostics;
 using System.Collections.Generic;
 using UnityEngine.Pool;
+using System;
 
 public readonly struct ActionResourceData
 {
@@ -29,7 +30,9 @@ public abstract class BaseActionData
 
     private SearchMethod searchMethod;
     private List<WorldObject> searchResult;
+
     private bool searchIgnoreCaster;
+    private HashSet<int> searchIngoreTarget;
 
     private float coolTime;
     public float CooltimeRatio => coolTime / resourceData.coolTime;
@@ -38,9 +41,13 @@ public abstract class BaseActionData
 
     private float runDelay;
 
+    public bool IsSelfExecuted { get; private set; }
     public string IconName { get; private set; }
+    public BaseActionDataSO AfterActionSO { get; private set; }
 
     protected CancellationTokenSource cancelToken;
+
+    private int refCount;
 
     public virtual void ResetVariables(BattleUnit owner, BaseActionDataSO data)
     {
@@ -53,12 +60,17 @@ public abstract class BaseActionData
         searchMethod = entitys.GetSearchMethod(data.SearchMethodType, data.SearchMethod);
         searchIgnoreCaster = data.SearchIgnoreCaster;
 
+        IsSelfExecuted = data.IsSelfExecuted;
+
         coolTime = resourceData.coolTime;
         isUpdateAble = true;
+
+        searchIngoreTarget = new HashSet<int>(8);
 
         runDelay = data.RunDelay;
 
         IconName = data.IconName;
+        AfterActionSO = data.AfterActionSO;
 
         searchResult = new List<WorldObject>();
         if (cancelToken == null)
@@ -95,11 +107,8 @@ public abstract class BaseActionData
 
     public bool SearchActionTarget()
     {
-        searchResult.Clear();
-
         if (searchIgnoreCaster)
         {
-            using var _ = HashSetPool<int>.Get(out HashSet<int> searchIngoreTarget);
             searchIngoreTarget.Add(owner.GetInstanceID());
             searchMethod.Run(owner, searchIngoreTarget, searchResult);
         }
@@ -110,11 +119,10 @@ public abstract class BaseActionData
         return searchResult.Count > 0;
     }
 
-    public bool SearchActionTarget(WorldObject caster, HashSet<int> searchIngoreTarget)
+    public bool SearchActionTarget(WorldObject caster)
     {
         Debug.Assert(caster != null);
         Debug.Assert(searchIngoreTarget != null);
-        searchResult.Clear();
 
         if (searchIgnoreCaster)
         {
@@ -125,11 +133,10 @@ public abstract class BaseActionData
         return searchResult.Count > 0;
     }
 
-    public bool SearchActionTarget(SearchMethod customeSearchMethod, WorldObject caster, HashSet<int> searchIngoreTarget)
+    public bool SearchActionTarget(SearchMethod customeSearchMethod, WorldObject caster)
     {
         Debug.Assert(caster != null);
         Debug.Assert(searchIngoreTarget != null);
-        searchResult.Clear();
 
         if (searchIgnoreCaster)
         {
@@ -140,7 +147,7 @@ public abstract class BaseActionData
         return searchResult.Count > 0;
     }
 
-    public async UniTask Execute()
+    public async UniTask Execute(WorldObject caster, Action<BaseActionData> onComplete = null)
     {
         Debug.Assert(IsExecuteAble());
         Debug.Assert(searchResult.Count > 0);
@@ -154,7 +161,7 @@ public abstract class BaseActionData
         float actionDuration = 0.0f;
         if (!isCanceled)
         {
-            actionDuration = RunActions(searchResult);
+            actionDuration = RunActions(caster, searchResult);
         }
 
         if (actionDuration > 0.0f)
@@ -166,9 +173,12 @@ public abstract class BaseActionData
         isUpdateAble = true;
 
         searchResult.Clear();
+        searchIngoreTarget.Clear();
+
+        onComplete?.Invoke(this);
     }
 
-    protected abstract float RunActions(List<WorldObject> searchResult);
+    protected abstract float RunActions(WorldObject caster, List<WorldObject> searchResult);
 
     public void Stop()
     {
@@ -179,7 +189,20 @@ public abstract class BaseActionData
         cancelToken = null;
     }
 
-    public virtual void Release()
+    public void IncreaseRefCount()
+    {
+        ++refCount;
+    }
+
+    public void DecreaseRefCount()
+    {
+        if (--refCount == 0)
+        {
+            ActionDataPool.Release(this);
+        }
+    }
+
+    protected virtual void Release()
     {
         isUpdateAble = false;
 

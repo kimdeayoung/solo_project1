@@ -33,7 +33,7 @@ public class RandomActionData : BaseActionData
         Debug.Assert(_actionParameters.Count == _actionWeights.Count);
     }
 
-    protected override float RunActions(List<WorldObject> searchResult)
+    protected override float RunActions(WorldObject caster, List<WorldObject> searchResult)
     {
         float duration = 0.0f;
         int actionWeights = _actionWeights.Count;
@@ -57,7 +57,7 @@ public class RandomActionData : BaseActionData
                 ActionParameter actionParameter = _actionParameters[i];
                 duration = actionParameter.RunDelay + actionParameter.Duration;
 
-                actionParameter.RunAction(searchResult, token);
+                actionParameter.RunAction(caster, searchResult, token);
                 owner.RunAnimation(actionParameter.AnimationName);
             }
         }
@@ -65,7 +65,7 @@ public class RandomActionData : BaseActionData
         return duration;
     }
 
-    public override void Release()
+    protected override void Release()
     {
         base.Release();
 

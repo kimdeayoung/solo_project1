@@ -14,9 +14,10 @@ public class ActionBtn : MonoBehaviour
     [SerializeField]
     private Image cooltimeCover;
 
+    private WorldObject caster;
     private BaseActionData actionData;
 
-    public void Init(BaseActionData actionData)
+    public void Init(WorldObject caster, BaseActionData actionData)
     {
         btnImage.SetSprite(actionData.IconName);
 
@@ -32,7 +33,7 @@ public class ActionBtn : MonoBehaviour
     {
         if (actionData.IsExecuteAble() && actionData.SearchActionTarget())
         {
-            actionData.Execute().Forget();
+            actionData.Execute(caster).Forget();
         }
     }
 }

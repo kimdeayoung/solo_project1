@@ -4,6 +4,9 @@ using UnityEngine.AddressableAssets;
 
 public abstract class BaseActionDataSO : ScriptableObject
 {
+    [SerializeField] private bool isSelfExecuted;
+    public bool IsSelfExecuted => isSelfExecuted;
+
     public abstract ActionDataType ActionType { get; }
 
     [SerializeField] private SearchMethodType searchMethodType;
