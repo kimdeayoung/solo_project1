@@ -25,7 +25,6 @@ public abstract class WorldObject : MonoBehaviour
 
     public virtual void OnFixedUpdate(float fixedDeltaTime)
     {
-        Status.OnFixedUpdate(fixedDeltaTime);
     }
 
     public bool IsAlive()
@@ -37,7 +36,7 @@ public abstract class WorldObject : MonoBehaviour
     {
     }
 
-    public void TryApplyKnockback(WorldObject target)
+    public void TryApplyKnockback(WorldObject target, float knockbackMultiplier = 1.0f)
     {
         UnitStatusGlobalVariables values = GameManager.Instance.GlobalVariables.UnitStatusGlobalVariables;
 
@@ -48,7 +47,7 @@ public abstract class WorldObject : MonoBehaviour
         }
 
         float duration = Random.Range(values.ApplyKnockbackDuration.x, values.ApplyKnockbackDuration.y);
-        target.Status.ApplyStatusInfluence(this, new AddStatusInfluenceData(AddStatusInfluenceType.Unique, StatusInfluenceType.Knockback, duration, value));
+        target.Status.ApplyStatusInfluence(this, new AddStatusInfluenceData(AddStatusInfluenceType.Unique, StatusInfluenceType.Knockback, duration, value * knockbackMultiplier));
     }
 
     public virtual bool TryExecuteAction(BaseActionData actionData)

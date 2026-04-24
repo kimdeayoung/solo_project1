@@ -37,15 +37,6 @@ public class StatusInfluenceInfo
         }
     }
 
-    public void OnFixedUpdate(float fixedDeltaTime)
-    {
-        int influenceTypeCount = _statusInfluences.Count;
-        for (int i = 0; i < influenceTypeCount; i++)
-        {
-            _statusInfluences[i].OnFixedUpdate(fixedDeltaTime);
-        }
-    }
-
     public void ApplyStatusInfluence(WorldObject caster, AddStatusInfluenceData data)
     {
         Debug.Assert(entitys != null);

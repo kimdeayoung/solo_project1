@@ -46,8 +46,4 @@ public abstract class StatusInfluence
         }
         return false;
     }
-
-    public virtual void OnFixedUpdate(float fixedDeltaTime)
-    {
-    }
 }

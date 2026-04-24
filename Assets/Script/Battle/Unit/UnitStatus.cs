@@ -24,12 +24,6 @@ public abstract class UnitStatus
         influenceInfo.OnUpdate(deltaTime);
     }
 
-    public void OnFixedUpdate(float fixedDeltaTime)
-    {
-        Debug.Assert(influenceInfo != null);
-        influenceInfo.OnFixedUpdate(fixedDeltaTime);
-    }
-
     public bool IsAlive()
     {
         return statusAttributes.IsAlive();

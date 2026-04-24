@@ -81,7 +81,7 @@ public class Player : BattleUnit
         WorldObject target = collision.gameObject.GetComponent<DetectableComponent>().WorldObject;
         HitParameter hitParameter = new HitParameter(Status.StatusAttributes, 1.0f);
         target.OnHit(hitParameter);
-        TryApplyKnockback(target);
+        TryApplyKnockback(target, 5.0f);
 
         int loopCount = _collisionActions.Count;
         for (int i = 0; i < loopCount; i++)

@@ -13,13 +13,8 @@ public class Knockback : StatusInfluence
         Vector3 direction = (owner.transform.position - caster.transform.position).normalized;
 
         knockbackForce = direction * data.value;
-        owner.Status.SetKnockbackState(true);
-    }
-
-    public override void OnFixedUpdate(float deltaTime)
-    {
-        base.OnFixedUpdate(deltaTime);
         owner.Rigidbody.AddForce(knockbackForce, ForceMode.VelocityChange);
+        owner.Status.SetKnockbackState(true);
     }
 
     public override void AddInfluence(WorldObject caster, AddStatusInfluenceData data)
