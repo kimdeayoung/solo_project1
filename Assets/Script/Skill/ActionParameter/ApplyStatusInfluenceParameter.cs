@@ -18,7 +18,7 @@ public class ApplyStatusInfluenceParameter : ActionParameter
         int loopCount = targets.Count;
         for (int i = 0; i < loopCount; i++)
         {
-            targets[i].Status.ApplyStatusInfluence(addStatusInfluenceData);
+            targets[i].Status.ApplyStatusInfluence(caster, addStatusInfluenceData);
         }
     }
 }

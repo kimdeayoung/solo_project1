@@ -9,7 +9,7 @@ public class EnemySpawner
     public void Init()
     {
         entitys = GameManager.Instance.SceneInstance<Battle>().Entity;
-        term = 2.0f;
+        term = 1.0f;
     }
 
     public void RegisterPlayer(Player player)
@@ -33,7 +33,7 @@ public class EnemySpawner
                 enemy.transform.position = playerPos + new Vector3(playerPos.x + randomDir.x * 5f, playerPos.y, playerPos.z + randomDir.y * 5f);
             }
 
-            term = 20.0f;
+            term = 100000000000.0f;
         }
     }
 }

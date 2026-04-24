@@ -47,8 +47,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c7ff9f9d0f801e47a2adec19eff42f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animator: {fileID: 2576101338059390975}
   rigidBody: {fileID: 4854275935337275844}
+  colliderComponent: {fileID: 6979546491851542920}
+  animator: {fileID: 2576101338059390975}
   _stat: {fileID: 11400000, guid: 192f7fc04cd485f48b40334c332c6023, type: 2}
 --- !u!54 &4854275935337275844
 Rigidbody:

@@ -23,6 +23,10 @@ public class ActionObject : WorldObject
         this.actionData = actionData;
     }
 
+    public override void OnFixedUpdate(float fixedDeltaTime)
+    {
+    }
+
     public void Run()
     {
         actionData.SearchActionTarget(this);

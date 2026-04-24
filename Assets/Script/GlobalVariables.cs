@@ -22,4 +22,10 @@ public class UnitStatusGlobalVariables
 
     [SerializeField] private float maxMoveSpeed;
     public float MaxMoveSpeed => maxMoveSpeed;
+
+    [SerializeField] private Vector2 applyKnockbackDuration;
+    public Vector2 ApplyKnockbackDuration => applyKnockbackDuration;
+
+    [SerializeField] private int applyKnockbackValue;
+    public int ApplyKnockbackValue => applyKnockbackValue;
 }

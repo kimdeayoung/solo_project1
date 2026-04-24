@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using EnemyState;
+using PlayerState;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -32,9 +33,10 @@ public class Enemy : BattleUnit
     {
         base.Init(assetName);
 
-        BehaviourController.AddBehaviourState<ChaseState>(this)
-                           .AddBehaviourState<ActionState>(this);
-        BehaviourController.SetBehaviourState(UnitState.Chase);
+        BehaviourController.AddBehaviourState<EnemyState.IdleState>(this)
+                           .AddBehaviourState<ActionState>(this)
+                           .AddBehaviourState<StunState>(this);
+        BehaviourController.SetBehaviourState(UnitState.Idle);
 
         Status = new EnemyStatus(this, _stat);
         onActionEnd = OnActionEnd;
@@ -66,14 +68,18 @@ public class Enemy : BattleUnit
 
     public override void OnUpdate(float deltaTime)
     {
+        base.OnUpdate(deltaTime);
         BehaviourController.OnUpdate(deltaTime);
-
-        //_agent.SetDestination(Target.transform.position);
     }
 
     public override void OnFixedUpdate(float fixedDeltaTime)
     {
         BehaviourController.OnFixedUpdate(fixedDeltaTime);
+    }
+
+    public void ChaseTarget()
+    {
+        //_agent.SetDestination(Target.transform.position);
     }
 
     public override void UpdateActionDatas(float deltaTime)
@@ -122,7 +128,7 @@ public class Enemy : BattleUnit
         BaseActionDataSO afterActionSO = actionData.AfterActionSO;
         if (afterActionSO == null)
         {
-            BehaviourController.SetBehaviourState(UnitState.Chase);
+            BehaviourController.SetBehaviourState(UnitState.Idle);
         }
         else
         {

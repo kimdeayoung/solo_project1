@@ -5,17 +5,17 @@ public class MoveSpeedUp : StatusInfluence
     private float applyValue;
     public override StatusInfluenceType InfluenceType => StatusInfluenceType.MoveSpeedUp;
 
-    public override void OnStart(WorldObject unit, AddStatusInfluenceData data)
+    public override void OnStart(WorldObject unit, WorldObject caster, AddStatusInfluenceData data)
     {
-        base.OnStart(unit, data);
+        base.OnStart(unit, caster, data);
 
         applyValue = data.value;
         owner.Status.ChangeMoveSpeed(applyValue);
     }
 
-    public override void AddInfluence(AddStatusInfluenceData data)
+    public override void AddInfluence(WorldObject caster, AddStatusInfluenceData data)
     {
-        base.AddInfluence(data);
+        base.AddInfluence(caster, data);
 
         applyValue += data.value;
         owner.Status.ChangeMoveSpeed(data.value);

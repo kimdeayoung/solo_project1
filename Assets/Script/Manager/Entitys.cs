@@ -248,6 +248,9 @@ public class Entitys
 
             case StatusInfluenceType.MoveSpeedDown:
                 return new MoveSpeedDown();
+
+            case StatusInfluenceType.Knockback:
+                return new Knockback();
         }
 
         return null;

@@ -29,7 +29,7 @@ public abstract class UnitStatus
         return statusAttributes.IsAlive();
     }
 
-    public void ApplyStatusInfluence(AddStatusInfluenceData data)
+    public void ApplyStatusInfluence(WorldObject caster, AddStatusInfluenceData data)
     {
         if (!IsAlive())
         {
@@ -37,7 +37,7 @@ public abstract class UnitStatus
         }
 
         Debug.Assert(influenceInfo != null);
-        influenceInfo.ApplyStatusInfluence(data);
+        influenceInfo.ApplyStatusInfluence(caster, data);
     }
 
     public virtual void ChangeMoveSpeed(float value)
@@ -79,6 +79,21 @@ public abstract class UnitStatus
                 case BattleUnit battleUnit:
                     battleUnit.BehaviourController.SetBehaviourState(UnitState.Idle);
                     break;
+            }
+        }
+    }
+
+    public void SetKnockbackState(bool knockback)
+    {
+        if (statusAttributes.TrySetKnockbackState(knockback))
+        {
+            if (knockback)
+            {
+                IncreaseStunCount();
+            }
+            else
+            {
+                DecreaseStunCount();
             }
         }
     }

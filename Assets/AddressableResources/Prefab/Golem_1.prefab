@@ -49,8 +49,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3dd9352ef9984e4b965d3bf127e1815, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
-  animator: {fileID: 6212571740715009484}
   rigidBody: {fileID: 1121108514213279773}
+  colliderComponent: {fileID: 1675591878960309993}
+  animator: {fileID: 6212571740715009484}
   _stat: {fileID: 11400000, guid: a06687cb167329e4b800122a04be8625, type: 2}
   _agent: {fileID: 1635693394329911513}
 --- !u!54 &1121108514213279773

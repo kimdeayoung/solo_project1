@@ -2,11 +2,11 @@ using UnityEngine;
 
 namespace EnemyState
 {
-    public class ChaseState : BehaviourState
+    public class IdleState : BehaviourState
     {
         private Enemy enemy;
 
-        public override UnitState UnitState => UnitState.Chase;
+        public override UnitState UnitState => UnitState.Idle;
 
         public override void Init(BattleUnit owner)
         {
@@ -22,12 +22,12 @@ namespace EnemyState
 
         public override void OnUpdate(float deltaTime)
         {
+            enemy.ChaseTarget();
             ownerBase.UpdateActionDatas(deltaTime);
         }
 
         public override void OnFixedUpdate(float fixedDeltaTime)
         {
-            //TODO: 이동 로직 Nav Mesh 사용으로 변경
         }
 
         public override void OnEnd()

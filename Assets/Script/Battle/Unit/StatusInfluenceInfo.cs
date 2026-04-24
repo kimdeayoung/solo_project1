@@ -37,7 +37,7 @@ public class StatusInfluenceInfo
         }
     }
 
-    public void ApplyStatusInfluence(AddStatusInfluenceData data)
+    public void ApplyStatusInfluence(WorldObject caster, AddStatusInfluenceData data)
     {
         Debug.Assert(entitys != null);
 
@@ -48,15 +48,27 @@ public class StatusInfluenceInfo
                     StatusInfluence preStatusInfluence = FindStatusInfluenceOrNull(data.statusInfluenceType, data.addStatusInfluenceType);
                     if (preStatusInfluence != null)
                     {
-                        preStatusInfluence.AddInfluence(data);
+                        preStatusInfluence.AddInfluence(caster, data);
                         return;
+                    }
+                }
+                break;
+
+            case AddStatusInfluenceType.Unique:
+                {
+                    StatusInfluence preStatusInfluence = FindStatusInfluenceOrNull(data.statusInfluenceType, data.addStatusInfluenceType);
+                    if (preStatusInfluence != null)
+                    {
+                        preStatusInfluence.RemoveInfluence();
                     }
                 }
                 break;
         }
 
         StatusInfluence statusInfluence = entitys.GetStatusInfluence(data.statusInfluenceType);
-        statusInfluence.OnStart(owner, data);
+        statusInfluence.OnStart(owner, caster, data);
+
+        _statusInfluences.Add(statusInfluence);
     }
 
     public StatusInfluence FindStatusInfluenceOrNull(StatusInfluenceType statusInfluenceType, AddStatusInfluenceType addStatusInfluenceType)

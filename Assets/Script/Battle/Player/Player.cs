@@ -4,8 +4,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using static UnityEngine.GraphicsBuffer;
 
 public class Player : BattleUnit
 {
@@ -66,6 +64,7 @@ public class Player : BattleUnit
 
     public override void OnUpdate(float deltaTime)
     {
+        base.OnUpdate(deltaTime);
         BehaviourController.OnUpdate(deltaTime);
     }
 
@@ -79,6 +78,7 @@ public class Player : BattleUnit
         WorldObject target = collision.gameObject.GetComponent<DetectableComponent>().WorldObject;
         HitParameter hitParameter = new HitParameter(Status.StatusAttributes, 1.0f);
         target.OnHit(hitParameter);
+        TryApplyKnockback(target);
 
         int loopCount = _collisionActions.Count;
         for (int i = 0; i < loopCount; i++)

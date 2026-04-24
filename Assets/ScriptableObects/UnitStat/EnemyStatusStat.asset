@@ -17,5 +17,6 @@ MonoBehaviour:
   _def: 0
   _moveSpeed: 3
   _rotate: 300
+  _weight: 3
   _collisionActions: []
   _actionDatas: []

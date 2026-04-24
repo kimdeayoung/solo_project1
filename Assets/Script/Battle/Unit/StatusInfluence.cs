@@ -7,7 +7,7 @@ public abstract class StatusInfluence
     public AddStatusInfluenceType AddStatusInfluenceType { get; private set; }
     public float Duration { get; protected set; }
 
-    public virtual void OnStart(WorldObject unit, AddStatusInfluenceData data)
+    public virtual void OnStart(WorldObject unit, WorldObject caster, AddStatusInfluenceData data)
     {
         owner = unit;
 
@@ -17,11 +17,12 @@ public abstract class StatusInfluence
 
     protected abstract void OnEnd();
 
-    public virtual void AddInfluence(AddStatusInfluenceData data)
+    public virtual void AddInfluence(WorldObject caster, AddStatusInfluenceData data)
     {
         switch (data.addStatusInfluenceType)
         {
             case AddStatusInfluenceType.Independent:
+            case AddStatusInfluenceType.Unique:
                 Debug.Assert(false);
                 break;
             case AddStatusInfluenceType.Stack:
@@ -37,11 +38,7 @@ public abstract class StatusInfluence
 
     public virtual bool OnUpdate(float deltaTime)
     {
-        if (Duration > 0.0f)
-        {
-            Duration -= deltaTime;
-        }
-
+        Duration -= deltaTime;
         if (Duration < 0)
         {
             OnEnd();

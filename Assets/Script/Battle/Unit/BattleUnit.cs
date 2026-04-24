@@ -11,21 +11,14 @@ public abstract class BattleUnit : WorldObject
     public IBehaviourController BehaviourController { get; private set; }
 
     [SerializeField] protected Animator animator;
-    [SerializeField] protected Rigidbody rigidBody;
 
-    public virtual void Init(string assetName)
+    public override void Init(string assetName)
     {
+        base.Init(assetName);
         BehaviourController = new BehaviourController();
 
         AssetName = assetName;
     }
-
-    public virtual void OnStart()
-    {
-    }
-
-    public abstract void OnUpdate(float deltaTime);
-    public abstract void OnFixedUpdate(float fixedDeltaTime);
 
     public virtual bool HasEnoughActionResource(ActionResourceData data)
     {

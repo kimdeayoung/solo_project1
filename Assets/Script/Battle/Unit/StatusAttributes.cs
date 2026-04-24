@@ -11,6 +11,9 @@ public class StatusAttributes
     public float Def { get; private set; }
 
     public int StunCount { get; private set; }
+    public bool Knockback { get; private set; }
+
+    public int Weight { get; private set; }
 
     private ClampValuePair<float, float> moveSpeed;
     public float MoveSpeed => moveSpeed.ClampValue;
@@ -26,6 +29,10 @@ public class StatusAttributes
         MaxHp = Hp = stat.Hp;
         Atk = stat.Atk;
         Def = stat.Def;
+
+        Knockback = false;
+
+        Weight = stat.Weight;
 
         moveSpeed = new ClampValuePair<float, float>(stat.MoveSpeed, stat.MoveSpeed);
         rotateSpeed = new ClampValuePair<float, float>(stat.Rotate, stat.Rotate);
@@ -64,5 +71,16 @@ public class StatusAttributes
     public void DecreaseStunCount()
     {
         --StunCount;
+    }
+
+    public bool TrySetKnockbackState(bool knockback)
+    {
+        if (Knockback == knockback)
+        {
+            return false;
+        }
+
+        Knockback = knockback;
+        return true;
     }
 }

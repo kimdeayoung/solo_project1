@@ -38,7 +38,6 @@ public enum UnitState
 {
     Idle,
     Stun,
-    Chase,
     Action,
 }
 
@@ -80,6 +79,7 @@ public enum StatusInfluenceType
     Stun,
     MoveSpeedUp,
     MoveSpeedDown,
+    Knockback,
     Length,
 }
 
@@ -87,6 +87,7 @@ public enum AddStatusInfluenceType
 {
     Independent,
     Stack,
+    Unique,
 }
 
 public enum AppearPriority
