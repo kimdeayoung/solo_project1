@@ -39,6 +39,7 @@ public class Enemy : BattleUnit
         BehaviourController.SetBehaviourState(UnitState.Idle);
 
         Status = new EnemyStatus(this, _stat);
+        rigidBody.mass = Status.StatusAttributes.Weight;
         onActionEnd = OnActionEnd;
     }
 
@@ -61,7 +62,7 @@ public class Enemy : BattleUnit
         ResetAgentProperty(new NavMeshAgentProperty(Status.StatusAttributes.MoveSpeed, 
                                                     Status.StatusAttributes.RotateSpeed));
 
-        //_agent.SetDestination(Target.transform.position);
+        _agent.SetDestination(Target.transform.position);
     }
 
     public override BattleUnitType Type => BattleUnitType.Enemy;
@@ -74,12 +75,18 @@ public class Enemy : BattleUnit
 
     public override void OnFixedUpdate(float fixedDeltaTime)
     {
+        base.OnFixedUpdate(fixedDeltaTime);
         BehaviourController.OnFixedUpdate(fixedDeltaTime);
+    }
+
+    public void SetEnableAgent(bool isEnable)
+    {
+        _agent.enabled = isEnable;
     }
 
     public void ChaseTarget()
     {
-        //_agent.SetDestination(Target.transform.position);
+        _agent.SetDestination(Target.transform.position);
     }
 
     public override void UpdateActionDatas(float deltaTime)

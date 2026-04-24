@@ -18,6 +18,7 @@ namespace EnemyState
 
         public override void OnStart()
         {
+            enemy.SetEnableAgent(true);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -32,6 +33,7 @@ namespace EnemyState
 
         public override void OnEnd()
         {
+            enemy.SetEnableAgent(false);
         }
     }
 }

@@ -20,8 +20,14 @@ public abstract class UnitStatus
 
     public void OnUpdate(float deltaTime)
     {
-        Assert.IsNotNull(influenceInfo);
+        Debug.Assert(influenceInfo != null);
         influenceInfo.OnUpdate(deltaTime);
+    }
+
+    public void OnFixedUpdate(float fixedDeltaTime)
+    {
+        Debug.Assert(influenceInfo != null);
+        influenceInfo.OnFixedUpdate(fixedDeltaTime);
     }
 
     public bool IsAlive()

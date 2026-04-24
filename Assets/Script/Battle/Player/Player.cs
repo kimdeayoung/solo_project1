@@ -30,6 +30,8 @@ public class Player : BattleUnit
         BehaviourController.SetBehaviourState(UnitState.Idle);
 
         Status = new PlayerStatus(this, _stat);
+        rigidBody.mass = Status.StatusAttributes.Weight;
+
         onActionEnd = OnActionEnd;
     }
 
@@ -70,10 +72,11 @@ public class Player : BattleUnit
 
     public override void OnFixedUpdate(float fixedDeltaTime)
     {
+        base.OnFixedUpdate(fixedDeltaTime);
         BehaviourController.OnFixedUpdate(fixedDeltaTime);
     }
 
-    private void OnTriggerEnter(Collider collision)
+    private void OnCollisionEnter(Collision collision)
     {
         WorldObject target = collision.gameObject.GetComponent<DetectableComponent>().WorldObject;
         HitParameter hitParameter = new HitParameter(Status.StatusAttributes, 1.0f);

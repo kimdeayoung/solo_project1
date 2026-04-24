@@ -2,9 +2,7 @@ using UnityEngine;
 
 public class Knockback : StatusInfluence
 {
-    private Vector3 startPosition;
-    private Vector3 targetPosition;
-    private float initialDuration;
+    private Vector3 knockbackForce;
 
     public override StatusInfluenceType InfluenceType => StatusInfluenceType.Knockback;
 
@@ -14,20 +12,14 @@ public class Knockback : StatusInfluence
 
         Vector3 direction = (owner.transform.position - caster.transform.position).normalized;
 
-        startPosition = owner.transform.position;
-        targetPosition = direction * data.value;
-        initialDuration = data.duration;
+        knockbackForce = direction * data.value;
         owner.Status.SetKnockbackState(true);
     }
 
-    public override bool OnUpdate(float deltaTime)
+    public override void OnFixedUpdate(float deltaTime)
     {
-        bool returnValue = base.OnUpdate(deltaTime);
-        if (!returnValue)
-        {
-            owner.Rigidbody.MovePosition(Vector3.Lerp(startPosition, targetPosition, 1f - (Duration / initialDuration)));
-        }
-        return returnValue;
+        base.OnFixedUpdate(deltaTime);
+        owner.Rigidbody.AddForce(knockbackForce, ForceMode.VelocityChange);
     }
 
     public override void AddInfluence(WorldObject caster, AddStatusInfluenceData data)
@@ -37,6 +29,9 @@ public class Knockback : StatusInfluence
 
     protected override void OnEnd()
     {
+        owner.Rigidbody.linearVelocity = Vector3.zero;
+        owner.Rigidbody.angularVelocity = Vector3.zero;
+
         owner.Status.SetKnockbackState(false);
     }
 }

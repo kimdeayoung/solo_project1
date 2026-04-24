@@ -9,7 +9,7 @@ public class EnemySpawner
     public void Init()
     {
         entitys = GameManager.Instance.SceneInstance<Battle>().Entity;
-        term = 1.0f;
+        term = 2.0f;
     }
 
     public void RegisterPlayer(Player player)
@@ -25,7 +25,7 @@ public class EnemySpawner
         {
             Vector3 playerPos = player.transform.position;
 
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 3; i++)
             {
                 Vector2 randomDir = Random.insideUnitCircle;
 

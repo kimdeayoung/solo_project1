@@ -23,7 +23,10 @@ public abstract class WorldObject : MonoBehaviour
         Status.OnUpdate(deltaTime);
     }
 
-    public abstract void OnFixedUpdate(float fixedDeltaTime);
+    public virtual void OnFixedUpdate(float fixedDeltaTime)
+    {
+        Status.OnFixedUpdate(fixedDeltaTime);
+    }
 
     public bool IsAlive()
     {
