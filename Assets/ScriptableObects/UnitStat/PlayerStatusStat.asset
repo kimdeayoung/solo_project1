@@ -15,9 +15,9 @@ MonoBehaviour:
   _hp: 100
   _atk: 1
   _def: 1
-  _moveSpeed: 8
-  _rotate: 480
-  _weight: 5
+  _moveSpeed: 14
+  _rotate: 240
+  _weight: 30
   _collisionActions: []
   _actionDatas:
   - {fileID: 11400000, guid: 7b3cce7726857414d8541bb183582e70, type: 2}

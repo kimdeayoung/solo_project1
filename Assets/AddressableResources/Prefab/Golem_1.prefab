@@ -52,8 +52,8 @@ MonoBehaviour:
   rigidBody: {fileID: 1121108514213279773}
   colliderComponent: {fileID: 1675591878960309993}
   animator: {fileID: 6212571740715009484}
-  _stat: {fileID: 11400000, guid: a06687cb167329e4b800122a04be8625, type: 2}
-  _agent: {fileID: 1635693394329911513}
+  stat: {fileID: 11400000, guid: a06687cb167329e4b800122a04be8625, type: 2}
+  agent: {fileID: 1635693394329911513}
 --- !u!54 &1121108514213279773
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -64,16 +64,16 @@ Rigidbody:
   serializedVersion: 5
   m_Mass: 1
   m_LinearDamping: 0
-  m_AngularDamping: 0.05
+  m_AngularDamping: 0
   m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 0, z: 1}
+  m_InertiaTensor: {x: 0, y: 0, z: 0}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 191
+    m_Bits: 63
   m_ImplicitCom: 0
   m_ImplicitTensor: 0
   m_UseGravity: 0

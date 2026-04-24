@@ -20,8 +20,8 @@ public readonly struct NavMeshAgentProperty
 
 public class Enemy : BattleUnit
 {
-    [SerializeField] private EnemyStatusStat _stat;
-    [SerializeField] private NavMeshAgent _agent;
+    [SerializeField] private EnemyStatusStat stat;
+    [SerializeField] private NavMeshAgent agent;
 
     public WorldObject Target { get; private set; }
     private List<BaseActionData> _actionDatas;
@@ -38,9 +38,12 @@ public class Enemy : BattleUnit
                            .AddBehaviourState<StunState>(this);
         BehaviourController.SetBehaviourState(UnitState.Idle);
 
-        Status = new EnemyStatus(this, _stat);
+        Status = new EnemyStatus(this, stat);
         rigidBody.mass = Status.StatusAttributes.Weight;
         onActionEnd = OnActionEnd;
+
+        agent.updatePosition = false;
+        agent.updateRotation = true;
     }
 
     public override void OnStart()
@@ -49,7 +52,7 @@ public class Enemy : BattleUnit
 
         Target = GameManager.Instance.SceneInstance<Battle>().Entity.Player;
         {
-            BaseActionDataSO[] actionDatas = _stat.ActionDatas;
+            BaseActionDataSO[] actionDatas = stat.ActionDatas;
             int actionDataCount = actionDatas.Length;
             _actionDatas = new List<BaseActionData>(actionDataCount);
             for (int i = 0; i < actionDataCount; i++)
@@ -62,7 +65,7 @@ public class Enemy : BattleUnit
         ResetAgentProperty(new NavMeshAgentProperty(Status.StatusAttributes.MoveSpeed, 
                                                     Status.StatusAttributes.RotateSpeed));
 
-        _agent.SetDestination(Target.transform.position);
+        agent.SetDestination(Target.transform.position);
     }
 
     public override BattleUnitType Type => BattleUnitType.Enemy;
@@ -81,12 +84,16 @@ public class Enemy : BattleUnit
 
     public void SetEnableAgent(bool isEnable)
     {
-        _agent.enabled = isEnable;
+        agent.enabled = isEnable;
     }
 
     public void ChaseTarget()
     {
-        _agent.SetDestination(Target.transform.position);
+        agent.SetDestination(Target.transform.position);
+        agent.nextPosition = rigidBody.position;
+
+        Vector3 moveStep = transform.forward * Status.StatusAttributes.MoveSpeed;
+        rigidBody.linearVelocity = moveStep;
     }
 
     public override void UpdateActionDatas(float deltaTime)
@@ -149,8 +156,8 @@ public class Enemy : BattleUnit
 
     public void ResetAgentProperty(NavMeshAgentProperty property)
     {
-        _agent.speed = property.speed;
-        _agent.angularSpeed = property.rotateSpeed;
+        agent.speed = property.speed;
+        agent.angularSpeed = property.rotateSpeed;
     }
 
     public override void OnHit(in HitParameter hitParameter)

@@ -18,5 +18,5 @@ MonoBehaviour:
   animationName: 
   influenceType: 1
   addStatusInfluenceType: 0
-  statusInfluenceDuration: 200
-  value: 30
+  statusInfluenceDuration: 2
+  value: 70

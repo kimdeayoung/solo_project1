@@ -109,6 +109,7 @@ public class Player : BattleUnit
     {
         if (moveIntensity <= float.Epsilon)
         {
+            rigidBody.linearVelocity = Vector3.zero;
             return;
         }
 
@@ -117,12 +118,8 @@ public class Player : BattleUnit
 
         rigidBody.MoveRotation(newRotation);
 
-        Vector3 forward = newRotation * Vector3.forward;
-        forward.y = 0f;
-        forward.Normalize();
-
-        Vector3 moveStep = forward * Status.StatusAttributes.MoveSpeed * moveIntensity * fixedDeltaTime;
-        rigidBody.MovePosition(rigidBody.position + moveStep);
+        Vector3 moveStep = transform.forward * Status.StatusAttributes.MoveSpeed * moveIntensity;
+        rigidBody.linearVelocity = moveStep;
     }
 
     public override bool TryExecuteAction(BaseActionData actionData)
