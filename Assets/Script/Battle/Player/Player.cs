@@ -8,16 +8,12 @@ using UnityEngine;
 public class Player : BattleUnit
 {
     [SerializeField] private PlayerStatusStat _stat;
+    [SerializeField] private float _hitApplyDotValue;
 
     public override BattleUnitType Type => BattleUnitType.Player;
 
     private Vector3 moveDirection;
     private float moveIntensity;
-
-    private List<BaseActionData> _actionDatas;
-    public IReadOnlyList<BaseActionData> ActionDatas => _actionDatas;
-
-    private List<BaseActionData> _collisionActions;
 
     private Action<BaseActionData> onActionEnd;
 
@@ -26,7 +22,8 @@ public class Player : BattleUnit
         base.Init(assetName);
 
         BehaviourController.AddBehaviourState<IdleState>(this)
-                           .AddBehaviourState<StunState>(this);
+                           .AddBehaviourState<StunState>(this)
+                           .AddBehaviourState<DeadState>(this);
         BehaviourController.SetBehaviourState(UnitState.Idle);
 
         Status = new PlayerStatus(this, _stat);
@@ -40,26 +37,26 @@ public class Player : BattleUnit
         base.OnStart();
 
         {
-            BaseActionDataSO[] actionDatas = _stat.ActionDatas;
-            int actionDataCount = actionDatas.Length;
-            _actionDatas = new List<BaseActionData>(actionDataCount);
+            BaseActionDataSO[] actionSOs = _stat.ActionDatas;
+            int actionDataCount = actionSOs.Length;
+            actionDatas = new List<BaseActionData>(actionDataCount);
             for (int i = 0; i < actionDataCount; i++)
             {
-                BaseActionData actionData = ActionDataPool.GetActionData(this, actionDatas[i]);
+                BaseActionData actionData = ActionDataPool.GetActionData(this, actionSOs[i]);
                 actionData.IncreaseRefCount();
-                _actionDatas.Add(actionData);
+                actionDatas.Add(actionData);
             }
         }
 
         {
-            BaseActionDataSO[] collisionActions = _stat.CollisionActions;
-            int collisionActionsCount = collisionActions.Length;
-            _collisionActions = new List<BaseActionData>(collisionActionsCount);
+            BaseActionDataSO[] collisionActionSOs = _stat.CollisionActions;
+            int collisionActionsCount = collisionActionSOs.Length;
+            collisionActions = new List<BaseActionData>(collisionActionsCount);
             for (int i = 0; i < collisionActionsCount; i++)
             {
-                BaseActionData actionData = ActionDataPool.GetActionData(this, collisionActions[i]);
+                BaseActionData actionData = ActionDataPool.GetActionData(this, collisionActionSOs[i]);
                 actionData.IncreaseRefCount();
-                _collisionActions.Add(actionData);
+                collisionActions.Add(actionData);
             }
         }
     }
@@ -76,26 +73,44 @@ public class Player : BattleUnit
         BehaviourController.OnFixedUpdate(fixedDeltaTime);
     }
 
-    private void OnCollisionEnter(Collision collision)
+    protected override bool IsHitAble(WorldObject target, out int weightOffset)
     {
-        WorldObject target = collision.gameObject.GetComponent<DetectableComponent>().WorldObject;
-        HitParameter hitParameter = new HitParameter(Status.StatusAttributes, 1.0f);
-        target.OnHit(hitParameter);
-        TryApplyKnockback(target, 5.0f);
+        weightOffset = 0;
 
-        int loopCount = _collisionActions.Count;
-        for (int i = 0; i < loopCount; i++)
+        float dot = Vector3.Dot(transform.forward, Vector3.Normalize(target.transform.position - transform.position));
+        if (dot < _hitApplyDotValue)
         {
-            TryExecuteAction(_collisionActions[i]);
+            return false;
+        }
+
+        UnitStatusGlobalVariables values = GameManager.Instance.GlobalVariables.UnitStatusGlobalVariables;
+        weightOffset = Status.StatusAttributes.Weight - target.Status.StatusAttributes.Weight;
+        if (weightOffset <= values.ApplyKnockbackValue)
+        {
+            return false;
+        }
+        return true;
+    }
+
+    public override void OnHit(ref HitParameter hitParameter)
+    {
+        base.OnHit(ref hitParameter);
+
+        if (IsAlive())
+        {
+        }
+        else
+        {
+            BehaviourController.SetBehaviourState(UnitState.Dead);
         }
     }
 
     public override void UpdateActionDatas(float deltaTime)
     {
-        int loopCount = _actionDatas.Count;
+        int loopCount = actionDatas.Count;
         for (int i = 0; i < loopCount; i++)
         {
-            _actionDatas[i].OnUpdate(deltaTime, Status.GetHaste());
+            actionDatas[i].OnUpdate(deltaTime, Status.GetHaste());
         }
     }
 

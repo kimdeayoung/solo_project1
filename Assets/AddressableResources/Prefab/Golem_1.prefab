@@ -53,6 +53,7 @@ MonoBehaviour:
   colliderComponent: {fileID: 1675591878960309993}
   animator: {fileID: 6212571740715009484}
   stat: {fileID: 11400000, guid: a06687cb167329e4b800122a04be8625, type: 2}
+  _hitApplyDotValue: -0.5
   agent: {fileID: 1635693394329911513}
 --- !u!54 &1121108514213279773
 Rigidbody:

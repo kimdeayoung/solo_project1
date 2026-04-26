@@ -1,0 +1,26 @@
+using UnityEngine;
+
+namespace EnemyState
+{
+    public class StunState : BehaviourState
+    {
+        public override UnitState UnitState => UnitState.Stun;
+
+        public override void OnStart()
+        {
+        }
+
+        public override void OnUpdate(float deltaTime)
+        {
+        }
+
+        public override void OnFixedUpdate(float fixedDeltaTime)
+        {
+        }
+
+        public override void OnEnd()
+        {
+        }
+    }
+}
+

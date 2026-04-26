@@ -1,6 +1,5 @@
 using Cysharp.Threading.Tasks;
 using EnemyState;
-using PlayerState;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -21,11 +20,11 @@ public readonly struct NavMeshAgentProperty
 public class Enemy : BattleUnit
 {
     [SerializeField] private EnemyStatusStat stat;
+    [SerializeField] private float _hitApplyDotValue;
+
     [SerializeField] private NavMeshAgent agent;
 
     public WorldObject Target { get; private set; }
-    private List<BaseActionData> _actionDatas;
-    public IReadOnlyList<BaseActionData> ActionDatas => _actionDatas;
 
     private Action<BaseActionData> onActionEnd;
 
@@ -33,9 +32,10 @@ public class Enemy : BattleUnit
     {
         base.Init(assetName);
 
-        BehaviourController.AddBehaviourState<EnemyState.IdleState>(this)
+        BehaviourController.AddBehaviourState<IdleState>(this)
                            .AddBehaviourState<ActionState>(this)
-                           .AddBehaviourState<StunState>(this);
+                           .AddBehaviourState<StunState>(this)
+                           .AddBehaviourState<DeadState>(this);
         BehaviourController.SetBehaviourState(UnitState.Idle);
 
         Status = new EnemyStatus(this, stat);
@@ -52,13 +52,13 @@ public class Enemy : BattleUnit
 
         Target = GameManager.Instance.SceneInstance<Battle>().Entity.Player;
         {
-            BaseActionDataSO[] actionDatas = stat.ActionDatas;
-            int actionDataCount = actionDatas.Length;
-            _actionDatas = new List<BaseActionData>(actionDataCount);
+            BaseActionDataSO[] actionDataSOs = stat.ActionDatas;
+            int actionDataCount = actionDataSOs.Length;
+            actionDatas = new List<BaseActionData>(actionDataCount);
             for (int i = 0; i < actionDataCount; i++)
             {
-                BaseActionData actionData = ActionDataPool.GetActionData(this, actionDatas[i]);
-                _actionDatas.Add(actionData);
+                BaseActionData actionData = ActionDataPool.GetActionData(this, actionDataSOs[i]);
+                actionDatas.Add(actionData);
             }
         }
 
@@ -96,17 +96,53 @@ public class Enemy : BattleUnit
         rigidBody.linearVelocity = moveStep;
     }
 
+    protected override bool IsHitAble(WorldObject target, out int weightOffset)
+    {
+        weightOffset = 0;
+        if (target.gameObject.layer != LayerMaskCached.Player)
+        {
+            return false;
+        }
+
+        UnitStatusGlobalVariables values = GameManager.Instance.GlobalVariables.UnitStatusGlobalVariables;
+        weightOffset = Status.StatusAttributes.Weight - target.Status.StatusAttributes.Weight;
+        if (weightOffset > values.ApplyKnockbackValue)
+        {
+            return true;
+        }
+
+        float dot = Vector3.Dot(transform.forward, Vector3.Normalize(target.transform.position - transform.position));
+        if (dot < _hitApplyDotValue)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    public override void OnHit(ref HitParameter hitParameter)
+    {
+        base.OnHit(ref hitParameter);
+
+        if (IsAlive())
+        {
+        }
+        else
+        {
+            BehaviourController.SetBehaviourState(UnitState.Dead);
+        }
+    }
     public override void UpdateActionDatas(float deltaTime)
     {
-        int loopCount = _actionDatas.Count;
+        int loopCount = actionDatas.Count;
         for (int i = 0; i < loopCount; i++)
         {
-            _actionDatas[i].OnUpdate(deltaTime, Status.GetHaste());
+            actionDatas[i].OnUpdate(deltaTime, Status.GetHaste());
         }
 
         for (int i = 0; i < loopCount; i++)
         {
-            if (TryExecuteAction(_actionDatas[i]))
+            if (TryExecuteAction(actionDatas[i]))
             {
                 break;
             }
@@ -158,12 +194,5 @@ public class Enemy : BattleUnit
     {
         agent.speed = property.speed;
         agent.angularSpeed = property.rotateSpeed;
-    }
-
-    public override void OnHit(in HitParameter hitParameter)
-    {
-        base.OnHit(hitParameter);
-
-        Debug.Log("On Hit Enemy");
     }
 }

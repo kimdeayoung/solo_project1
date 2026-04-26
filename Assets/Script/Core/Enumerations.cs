@@ -39,6 +39,7 @@ public enum UnitState
     Idle,
     Stun,
     Action,
+    Dead,
 }
 
 public enum StageDifficultyType
@@ -80,6 +81,7 @@ public enum StatusInfluenceType
     MoveSpeedUp,
     MoveSpeedDown,
     Knockback,
+    Invincible,
     Length,
 }
 

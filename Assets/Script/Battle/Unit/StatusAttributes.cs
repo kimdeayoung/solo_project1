@@ -10,6 +10,8 @@ public class StatusAttributes
     public float Atk { get; private set; }
     public float Def { get; private set; }
 
+    public float CollisionDamageMultiplier { get; private set; }
+
     public int StunCount { get; private set; }
     public bool Knockback { get; private set; }
 
@@ -30,6 +32,8 @@ public class StatusAttributes
         Atk = stat.Atk;
         Def = stat.Def;
 
+        CollisionDamageMultiplier = stat.CollisionDamageMultiplier;
+
         Knockback = false;
 
         Weight = stat.Weight;
@@ -43,6 +47,11 @@ public class StatusAttributes
     public bool IsAlive()
     {
         return Hp > 0;
+    }
+
+    public void ApplyDamage(int damage)
+    {
+        Hp -= damage;
     }
 
     public void ChangeMoveSpeed(float value)

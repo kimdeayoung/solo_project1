@@ -32,22 +32,8 @@ public abstract class WorldObject : MonoBehaviour
         return Status.IsAlive();
     }
 
-    public virtual void OnHit(in HitParameter hitParameter)
+    public virtual void OnHit(ref HitParameter hitParameter)
     {
-    }
-
-    public void TryApplyKnockback(WorldObject target, float knockbackMultiplier = 1.0f)
-    {
-        UnitStatusGlobalVariables values = GameManager.Instance.GlobalVariables.UnitStatusGlobalVariables;
-
-        int value = Status.StatusAttributes.Weight - target.Status.StatusAttributes.Weight;
-        if (value <= values.ApplyKnockbackValue)
-        {
-            return;
-        }
-
-        float duration = Random.Range(values.ApplyKnockbackDuration.x, values.ApplyKnockbackDuration.y);
-        target.Status.ApplyStatusInfluence(this, new AddStatusInfluenceData(AddStatusInfluenceType.Unique, StatusInfluenceType.Knockback, duration, value * knockbackMultiplier));
     }
 
     public virtual bool TryExecuteAction(BaseActionData actionData)

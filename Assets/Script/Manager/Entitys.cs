@@ -251,6 +251,9 @@ public class Entitys
 
             case StatusInfluenceType.Knockback:
                 return new Knockback();
+
+            case StatusInfluenceType.Invincible:
+                return new Invincible();
         }
 
         return null;

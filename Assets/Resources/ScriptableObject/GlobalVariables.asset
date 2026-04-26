@@ -17,5 +17,6 @@ MonoBehaviour:
   unitStatusGlobalVariables:
     minMoveSpeed: 1
     maxMoveSpeed: 500
+    hitApplyAngle: 0.5
     applyKnockbackDuration: {x: 0.23, y: 0.28}
     applyKnockbackValue: 0

@@ -27,7 +27,7 @@ public class MeleeHitParameter : ActionParameter
             if (dotValue < hitThresholdAngle)
             {
                 HitParameter hitParameter = new HitParameter(caster.Status.StatusAttributes, damageMultiplier);
-                target.OnHit(hitParameter);
+                target.OnHit(ref hitParameter);
             }
         }
     }

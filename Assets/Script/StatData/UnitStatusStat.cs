@@ -11,6 +11,9 @@ public abstract class UnitStat : ScriptableObject
     [SerializeField] private float _def;
     public float Def => _def;
 
+    [SerializeField] private float _collisionDamageMultiplier;
+    public float CollisionDamageMultiplier => _collisionDamageMultiplier;
+
     [SerializeField] private float _moveSpeed;
     public float MoveSpeed => _moveSpeed;
 

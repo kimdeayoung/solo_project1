@@ -37,6 +37,19 @@ public class StatusInfluenceInfo
         }
     }
 
+    public void RunOnHitStatusInfluence(ref HitParameter hitParameter)
+    {
+        int influenceTypeCount = _statusInfluences.Count;
+        for (int i = 0; i < influenceTypeCount; ++i)
+        {
+            IHitStatusInfluence hitStatusInfluence = _statusInfluences[i] as IHitStatusInfluence;
+            if (hitStatusInfluence != null)
+            {
+                hitStatusInfluence.RunOnHitAction(ref hitParameter);
+            }
+        }
+    }
+
     public void ApplyStatusInfluence(WorldObject caster, AddStatusInfluenceData data)
     {
         Debug.Assert(entitys != null);

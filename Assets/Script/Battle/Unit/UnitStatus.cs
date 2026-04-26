@@ -40,6 +40,17 @@ public abstract class UnitStatus
         influenceInfo.ApplyStatusInfluence(caster, data);
     }
 
+    public void RunOnHitStatusInfluence(ref HitParameter hitParameter)
+    {
+        if (!IsAlive())
+        {
+            return;
+        }
+
+        Debug.Assert(influenceInfo != null);
+        influenceInfo.RunOnHitStatusInfluence(ref hitParameter);
+    }
+
     public virtual void ChangeMoveSpeed(float value)
     {
         statusAttributes.ChangeMoveSpeed(value);
