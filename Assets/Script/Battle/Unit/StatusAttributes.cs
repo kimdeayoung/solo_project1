@@ -1,4 +1,3 @@
-using NUnit.Framework;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,9 +7,13 @@ public class StatusAttributes
     public int MaxHp { get; private set; }
 
     public float Atk { get; private set; }
-    public float Def { get; private set; }
+    public float DefT0 { get; private set; }
+
+    private ClampValuePair<float, float> defT1;
+    public float DefT1 => defT1.ClampValue;
 
     public float CollisionDamageMultiplier { get; private set; }
+    public float HealMultiplier { get; private set; }
 
     public int StunCount { get; private set; }
     public bool Knockback { get; private set; }
@@ -30,9 +33,12 @@ public class StatusAttributes
     {
         MaxHp = Hp = stat.Hp;
         Atk = stat.Atk;
-        Def = stat.Def;
+
+        DefT0 = stat.DefT0;
+        defT1 = new ClampValuePair<float, float>(stat.DefT1, stat.DefT1);
 
         CollisionDamageMultiplier = stat.CollisionDamageMultiplier;
+        HealMultiplier = stat.HealMultiplier;
 
         Knockback = false;
 
@@ -49,9 +55,28 @@ public class StatusAttributes
         return Hp > 0;
     }
 
-    public void ApplyDamage(int damage)
+    public void ApplyDamage(int damage, out int trueDamage)
     {
         Hp -= damage;
+
+        trueDamage = damage;
+        if (Hp < 0)
+        {
+            trueDamage -= Hp;
+            Hp = 0;
+        }
+    }
+
+    public void ApplyHeal(int value, out int trueHeal)
+    {
+        Hp += value;
+
+        trueHeal = value;
+        if (Hp > MaxHp)
+        {
+            trueHeal += MaxHp - Hp;
+            Hp = MaxHp;
+        }
     }
 
     public void ChangeMoveSpeed(float value)

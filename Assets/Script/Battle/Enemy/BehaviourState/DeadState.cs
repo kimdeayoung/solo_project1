@@ -18,6 +18,7 @@ namespace EnemyState
 
         public override void OnStart()
         {
+            enemy.RemoveStatusInfluences(RemoveStatusInfluenceType.OnDead);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -25,6 +26,10 @@ namespace EnemyState
         }
 
         public override void OnFixedUpdate(float fixedDeltaTime)
+        {
+        }
+
+        public override void OnCollisionEnter(WorldObject target)
         {
         }
 

@@ -13,5 +13,6 @@ public abstract class BehaviourState
     public abstract void OnStart();
     public abstract void OnUpdate(float deltaTime);
     public abstract void OnFixedUpdate(float fixedDeltaTime);
+    public abstract void OnCollisionEnter(WorldObject target);
     public abstract void OnEnd();
 }

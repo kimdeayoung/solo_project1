@@ -5,6 +5,7 @@ public abstract class StatusInfluence
     protected WorldObject owner;
     public abstract StatusInfluenceType InfluenceType { get; }
     public AddStatusInfluenceType AddStatusInfluenceType { get; private set; }
+    public abstract RemoveStatusInfluenceType RemoveStatusInfluenceType { get; }
     public float Duration { get; protected set; }
 
     public virtual void OnStart(WorldObject unit, WorldObject caster, AddStatusInfluenceData data)

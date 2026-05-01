@@ -18,6 +18,10 @@ namespace PlayerState
         {
         }
 
+        public override void OnCollisionEnter(WorldObject target)
+        {
+        }
+
         public override void OnEnd()
         {
         }

@@ -31,6 +31,10 @@ namespace EnemyState
         {
         }
 
+        public override void OnCollisionEnter(WorldObject target)
+        {
+        }
+
         public override void OnEnd()
         {
             enemy.SetEnableAgent(false);

@@ -5,6 +5,8 @@ public class MoveSpeedUp : StatusInfluence
     private float applyValue;
     public override StatusInfluenceType InfluenceType => StatusInfluenceType.MoveSpeedUp;
 
+    public override RemoveStatusInfluenceType RemoveStatusInfluenceType => RemoveStatusInfluenceType.All;
+
     public override void OnStart(WorldObject unit, WorldObject caster, AddStatusInfluenceData data)
     {
         base.OnStart(unit, caster, data);

@@ -8,11 +8,17 @@ public abstract class UnitStat : ScriptableObject
     [SerializeField] private float _atk;
     public float Atk => _atk;
 
-    [SerializeField] private float _def;
-    public float Def => _def;
+    [SerializeField] private float _defT0;
+    public float DefT0 => _defT0;
+
+    [SerializeField] private float _defT1;
+    public float DefT1 => _defT1;
 
     [SerializeField] private float _collisionDamageMultiplier;
     public float CollisionDamageMultiplier => _collisionDamageMultiplier;
+
+    [SerializeField] private float _healMultiplier;
+    public float HealMultiplier => _healMultiplier;
 
     [SerializeField] private float _moveSpeed;
     public float MoveSpeed => _moveSpeed;

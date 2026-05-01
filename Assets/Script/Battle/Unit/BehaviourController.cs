@@ -9,6 +9,8 @@ public interface IBehaviourController
     void SetBehaviourState(UnitState state);
     void OnUpdate(float deltaTime);
     void OnFixedUpdate(float fixedDeltaTime);
+
+    void OnCollisionEnter(WorldObject target);
 }
 
 public class BehaviourController : IBehaviourController
@@ -57,5 +59,10 @@ public class BehaviourController : IBehaviourController
     public void OnFixedUpdate(float fixedDeltaTime)
     {
         CurrentState.OnFixedUpdate(fixedDeltaTime);
+    }
+
+    public void OnCollisionEnter(WorldObject target)
+    {
+        CurrentState.OnCollisionEnter(target);
     }
 }

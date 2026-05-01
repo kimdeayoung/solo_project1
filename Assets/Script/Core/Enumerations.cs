@@ -1,3 +1,5 @@
+using System;
+
 public enum TableType
 {
     Stage,
@@ -90,6 +92,15 @@ public enum AddStatusInfluenceType
     Independent,
     Stack,
     Unique,
+}
+
+[Flags]
+public enum RemoveStatusInfluenceType
+{
+    OnDead = 1,
+    OnRelease = 1 << 1,
+
+    All = OnDead | OnRelease,
 }
 
 public enum AppearPriority

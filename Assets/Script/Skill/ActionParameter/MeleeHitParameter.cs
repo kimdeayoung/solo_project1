@@ -23,10 +23,10 @@ public class MeleeHitParameter : ActionParameter
         for (int i = 0; i < targets.Count; i++)
         {
             WorldObject target = targets[i];
-            float dotValue = Vector3.Dot(caster.transform.forward, target.transform.forward);
-            if (dotValue < hitThresholdAngle)
+            float dot = Vector3.Dot(caster.transform.forward, Vector3.Normalize(target.transform.position - caster.transform.position));
+            if (dot < hitThresholdAngle)
             {
-                HitParameter hitParameter = new HitParameter(caster.Status.StatusAttributes, damageMultiplier);
+                HitParameter hitParameter = new HitParameter(caster.Status.StatusAttributes, damageMultiplier, 1.0f, 0);
                 target.OnHit(ref hitParameter);
             }
         }

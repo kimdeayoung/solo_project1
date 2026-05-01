@@ -9,6 +9,8 @@ public abstract class BattleUnit : WorldObject
 
     public string AssetName { get; private set; }
 
+    public abstract float AccelerationRatio { get; }
+
     public IBehaviourController BehaviourController { get; private set; }
 
     protected List<BaseActionData> actionDatas;
@@ -57,7 +59,7 @@ public abstract class BattleUnit : WorldObject
 
         if (IsHitAble(target, out int weightOffset))
         {
-            HitParameter hitParameter = new HitParameter(Status.StatusAttributes, Status.StatusAttributes.CollisionDamageMultiplier);
+            HitParameter hitParameter = new HitParameter(Status.StatusAttributes, Status.StatusAttributes.CollisionDamageMultiplier, AccelerationRatio, weightOffset);
             target.OnHit(ref hitParameter);
 
             UnitStatusGlobalVariables values = GameManager.Instance.GlobalVariables.UnitStatusGlobalVariables;
@@ -76,6 +78,8 @@ public abstract class BattleUnit : WorldObject
                     TryExecuteAction(collisionActions[i]);
                 }
             }
+
+            BehaviourController.OnCollisionEnter(target);
         }
     }
 
@@ -87,12 +91,26 @@ public abstract class BattleUnit : WorldObject
 
         Status.RunOnHitStatusInfluence(ref hitParameter);
 
-        float damage = (hitParameter.statusAttributes.Atk - Status.StatusAttributes.Def) * hitParameter.damageMultiplier;
-        Status.StatusAttributes.ApplyDamage((int)damage);
+        int damage = hitParameter.GetDamage();
+        if (damage > 0)
+        {
+            Status.StatusAttributes.ApplyDamage(damage, out int trueDamage);
+            Debug.Log($"onDamage: {trueDamage}");
+            //TODO: Display damage font(trueDamage)
+        }
     }
 
-    public virtual void Release()
+    public override void OnHeal(int value)
     {
+        base.OnHeal(value);
 
+        float heal = value * Status.StatusAttributes.HealMultiplier;
+        if (heal <= 0.0f)
+        {
+            return;
+        }
+
+        Status.StatusAttributes.ApplyHeal(Mathf.CeilToInt(heal), out int trueHeal);
+        //TODO: Display heal font(trueDamage)
     }
 }

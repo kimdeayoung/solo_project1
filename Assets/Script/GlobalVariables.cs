@@ -28,4 +28,7 @@ public class UnitStatusGlobalVariables
 
     [SerializeField] private int applyKnockbackValue;
     public int ApplyKnockbackValue => applyKnockbackValue;
+
+    [SerializeField] private float knockbackCollisionAtk;
+    public float KnockbackCollisionAtk => knockbackCollisionAtk;
 }

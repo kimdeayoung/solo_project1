@@ -36,8 +36,22 @@ public abstract class WorldObject : MonoBehaviour
     {
     }
 
+    public virtual void OnHeal(int value)
+    {
+    }
+
     public virtual bool TryExecuteAction(BaseActionData actionData)
     {
         return false;
+    }
+
+    public void RemoveStatusInfluences(RemoveStatusInfluenceType removeStatusInfluenceType)
+    {
+        Status.RemoveStatusInfluences(removeStatusInfluenceType);
+    }
+
+    public virtual void Release()
+    {
+        RemoveStatusInfluences(RemoveStatusInfluenceType.All);
     }
 }

@@ -6,6 +6,8 @@ public class Invincible : StatusInfluence, IHitStatusInfluence
 
     public override StatusInfluenceType InfluenceType => StatusInfluenceType.Invincible;
 
+    public override RemoveStatusInfluenceType RemoveStatusInfluenceType => RemoveStatusInfluenceType.All;
+
     public override void OnStart(WorldObject unit, WorldObject caster, AddStatusInfluenceData data)
     {
         base.OnStart(unit, caster, data);
@@ -30,7 +32,7 @@ public class Invincible : StatusInfluence, IHitStatusInfluence
             }
         }
 
-        HitParameter parameter = new HitParameter(hitParameter.statusAttributes, 0.0f);
+        HitParameter parameter = new HitParameter(hitParameter.atk, hitParameter.defT0, hitParameter.defT1, 0.0f, hitParameter.accelerationRatio, hitParameter.weightOffset);
         hitParameter = parameter;
     }
 

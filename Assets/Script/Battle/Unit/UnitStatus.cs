@@ -108,4 +108,9 @@ public abstract class UnitStatus
             }
         }
     }
+
+    public void RemoveStatusInfluences(RemoveStatusInfluenceType type)
+    {
+        influenceInfo.RemoveStatusInfluences(type);
+    }
 }

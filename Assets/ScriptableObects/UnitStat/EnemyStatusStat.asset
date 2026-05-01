@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: EnemyStatusStat
   m_EditorClassIdentifier: Assembly-CSharp::EnemyStatusStat
   _hp: 100
-  _atk: 1
-  _def: 0
+  _atk: 10
+  _defT0: 0
+  _defT1: 0
+  _collisionDamageMultiplier: 1
+  _healMultiplier: 1
   _moveSpeed: 3
   _rotate: 300
   _weight: 3

@@ -30,6 +30,10 @@ namespace PlayerState
             player.MoveWithRotation(fixedDeltaTime);
         }
 
+        public override void OnCollisionEnter(WorldObject target)
+        {
+        }
+
         public override void OnEnd()
         {
         }

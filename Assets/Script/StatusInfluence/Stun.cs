@@ -4,6 +4,8 @@ public class Stun : StatusInfluence
 {
     public override StatusInfluenceType InfluenceType => StatusInfluenceType.Stun;
 
+    public override RemoveStatusInfluenceType RemoveStatusInfluenceType => RemoveStatusInfluenceType.All;
+
     public override void OnStart(WorldObject unit, WorldObject caster, AddStatusInfluenceData data)
     {
         base.OnStart(unit, caster, data);

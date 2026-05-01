@@ -23,6 +23,7 @@ public class Enemy : BattleUnit
     [SerializeField] private float _hitApplyDotValue;
 
     [SerializeField] private NavMeshAgent agent;
+    public override float AccelerationRatio => 1.0f;
 
     public WorldObject Target { get; private set; }
 
@@ -106,9 +107,9 @@ public class Enemy : BattleUnit
 
         UnitStatusGlobalVariables values = GameManager.Instance.GlobalVariables.UnitStatusGlobalVariables;
         weightOffset = Status.StatusAttributes.Weight - target.Status.StatusAttributes.Weight;
-        if (weightOffset > values.ApplyKnockbackValue)
+        if (weightOffset <= values.ApplyKnockbackValue)
         {
-            return true;
+            return false;
         }
 
         float dot = Vector3.Dot(transform.forward, Vector3.Normalize(target.transform.position - transform.position));
@@ -194,5 +195,22 @@ public class Enemy : BattleUnit
     {
         agent.speed = property.speed;
         agent.angularSpeed = property.rotateSpeed;
+    }
+
+    public override void Release()
+    {
+        base.Release();
+
+        int actionDataCount = actionDatas.Count;
+        for (int i = 0; i < actionDataCount; i++)
+        {
+            actionDatas[i].DecreaseRefCount();
+        }
+
+        int collisionActionsCount = collisionActions.Count;
+        for (int i = 0; i < collisionActionsCount; i++)
+        {
+            collisionActions[i].DecreaseRefCount();
+        }
     }
 }

@@ -110,4 +110,16 @@ public class StatusInfluenceInfo
             }
         }
     }
+
+    public void RemoveStatusInfluences(RemoveStatusInfluenceType type)
+    {
+        int influenceTypeCount = _statusInfluences.Count;
+        for (int i = 0; i < influenceTypeCount; ++i)
+        {
+            if ((_statusInfluences[i].RemoveStatusInfluenceType & type) != 0)
+            {
+                _statusInfluences[i].RemoveInfluence();
+            }
+        }
+    }
 }

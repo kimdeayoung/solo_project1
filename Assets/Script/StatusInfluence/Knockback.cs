@@ -6,6 +6,8 @@ public class Knockback : StatusInfluence
 
     public override StatusInfluenceType InfluenceType => StatusInfluenceType.Knockback;
 
+    public override RemoveStatusInfluenceType RemoveStatusInfluenceType => RemoveStatusInfluenceType.OnRelease;
+
     public override void OnStart(WorldObject unit, WorldObject caster, AddStatusInfluenceData data)
     {
         base.OnStart(unit, caster, data);

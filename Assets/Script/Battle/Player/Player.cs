@@ -12,8 +12,10 @@ public class Player : BattleUnit
 
     public override BattleUnitType Type => BattleUnitType.Player;
 
+
     private Vector3 moveDirection;
     private float moveIntensity;
+    public override float AccelerationRatio => moveIntensity;
 
     private Action<BaseActionData> onActionEnd;
 
@@ -171,6 +173,23 @@ public class Player : BattleUnit
             {
                 afterAction.DecreaseRefCount();
             }
+        }
+    }
+
+    public override void Release()
+    {
+        base.Release();
+
+        int actionDataCount = actionDatas.Count;
+        for (int i = 0; i < actionDataCount; i++)
+        {
+            actionDatas[i].DecreaseRefCount();
+        }
+
+        int collisionActionsCount = collisionActions.Count;
+        for (int i = 0; i < collisionActionsCount; i++)
+        {
+            collisionActions[i].DecreaseRefCount();
         }
     }
 }
