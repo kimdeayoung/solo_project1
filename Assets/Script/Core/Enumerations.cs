@@ -1,17 +1,5 @@
 using System;
 
-public enum TableType
-{
-    Stage,
-    Length,
-}
-
-public enum TableLoadType
-{
-    Local,
-    Binary,
-}
-
 public enum SearchMethodType
 {
     Self,

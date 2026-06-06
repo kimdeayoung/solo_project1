@@ -1,10 +1,8 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Xml;
 using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.Scripting;
 
 public static class XmlHelper
 {

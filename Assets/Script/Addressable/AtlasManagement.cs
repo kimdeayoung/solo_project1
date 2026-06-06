@@ -5,7 +5,6 @@ using UnityEngine;
 using UnityEngine.U2D;
 using System;
 using UnityEngine.UI;
-using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
 public class AtlasInfo
 {

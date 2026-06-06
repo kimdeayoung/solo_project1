@@ -15,9 +15,6 @@ public class TableFactory
 
         switch (tableType)
         {
-            case TableType.Stage:
-                trFoundation = new TRStage();
-                break;
             default:
                 Assert.IsTrue(false);
                 break;
