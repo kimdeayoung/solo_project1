@@ -10,4 +10,5 @@ public enum CommandContextGroupType
 public enum CommandContextType
 {
     WaitEnterScene,
+    WaitForSeconds,
 }

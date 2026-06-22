@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine;
+using Unity.Collections;
 
 
 [CreateAssetMenu(fileName = "CommandContextContainer", menuName = "Command Context/" + "Command Context Container")]
@@ -16,7 +17,7 @@ public class CommandContextContainer : ScriptableObject
     public CommandResetFlag ResetFlag => resetFlag;
 
     [SerializeField] private CommandContextNode rootNode;
-    private List<CommandContextNode> allNodes; //savepoint Å½»ö¿ë
+    [ReadOnly][SerializeField] private List<CommandContextNode> allNodes; //savepoint Å½»ö¿ë
 
     [NonSerialized] private bool isInitialize;
     public bool IsInitialize => isInitialize;
@@ -45,7 +46,15 @@ public class CommandContextContainer : ScriptableObject
 
     public void RegisterSavePoint(CommandContextNode node)
     {
-
+        int loopCount = allNodes.Count;
+        for (int i = 0; i < loopCount; i++)
+        {
+            if (allNodes[i] == node)
+            {
+                //
+                break;
+            }
+        }
     }
 
     public void Stop()
